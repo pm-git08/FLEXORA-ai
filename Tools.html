@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FLEXORA Tools</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f9fcff;
+  margin: 0;
+  padding: 0;
+}
+
+.tools-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #0a0a0a;
+}
+
+.subtitle {
+  max-width: 600px;
+  margin: 10px auto 40px;
+  color: #555;
+  font-size: 16px;
+}
+
+.tools-block {
+  margin-bottom: 50px;
+}
+
+.tools-block h3 {
+  font-size: 24px;
+  text-align: left;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+  gap: 20px;
+}
+
+.tool-card {
+  background: #ffffff;
+  padding: 30px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.tool-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.tool-card i {
+  font-size: 28px;
+  color: #0a66c2;
+  margin-bottom: 10px;
+}
+
+.tool-card span {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+</style>
+</head>
+<body>
+  <section class="tools-section">
+    <h2 class="title">Tools</h2>
+    <p class="subtitle">
+      Boost your workflow with our integrated tools. Essentials included, plus added-value solutions that go beyond the basics.
+    </p>
+
+    <div class="tools-block">
+      <h3>Essential Tools</h3>
+      <div class="tools-grid">
+        <div class="tool-card"><i class="fas fa-chart-bar"></i><span>Project Management</span></div>
+        <div class="tool-card"><i class="fas fa-stopwatch"></i><span>Time Tracking</span></div>
+        <div class="tool-card"><i class="fas fa-file-invoice-dollar"></i><span>Invoicing</span></div>
+        <div class="tool-card"><i class="fas fa-file-signature"></i><span>Contracts</span></div>
+        <div class="tool-card"><i class="fas fa-folder-open"></i><span>File Sharing</span></div>
+        <div class="tool-card"><i class="fas fa-credit-card"></i><span>Payments</span></div>
+        <div class="tool-card"><i class="fas fa-check-circle"></i><span>Portfolio Builder</span></div>
+        <div class="tool-card"><i class="fas fa-comments"></i><span>Community Forums</span></div>
+      </div>
+    </div>
+
+    <div class="tools-block">
+      <h3>Bespoke Solutions</h3>
+      <div class="tools-grid">
+        <div class="tool-card"><i class="fas fa-star"></i><span>Skill Assessments</span></div>
+        <div class="tool-card"><i class="fas fa-chalkboard"></i><span>Whiteboard</span></div>
+        <div class="tool-card"><i class="fas fa-robot"></i><span>AI Job Match</span></div>
+        <div class="tool-card"><i class="fas fa-gavel"></i><span>Legal Chatbot</span></div>
+        <div class="tool-card"><i class="fas fa-home"></i><span>Remote Readiness</span></div>
+        <div class="tool-card"><i class="fas fa-heartbeat"></i><span>Health Tracker</span></div>
+        <div class="tool-card"><i class="fas fa-users"></i><span>Community Forums</span></div>
+        <div class="tool-card"><i class="fas fa-paint-brush"></i><span>Branding Tools</span></div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

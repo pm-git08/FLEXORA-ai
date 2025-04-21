@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobs - Flexora</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f1a;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .job-hero {
+      text-align: center;
+      padding: 4rem 1rem 2rem;
+    }
+
+    .job-hero h1 {
+      font-size: 3rem;
+      color: #6C63FF;
+    }
+
+    .job-hero p {
+      max-width: 600px;
+      margin: 1rem auto;
+      color: #cfcfcf;
+    }
+
+    .job-sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .job-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(108, 99, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .job-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .job-card h2 {
+      color: #6C63FF;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .job-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .job-card ul li {
+      margin-bottom: 0.7rem;
+      padding-left: 1.2rem;
+      position: relative;
+      color: #e0e0e0;
+    }
+
+    .job-card ul li::before {
+      content: "\2022";
+      color: #6C63FF;
+      position: absolute;
+      left: 0;
+    }
+
+    .btn-apply {
+      display: inline-block;
+      margin-top: 1rem;
+      background: #6C63FF;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .btn-apply:hover {
+      background: #564de0;
+    }
+  </style>
+</head>
+<body>
+  <section class="job-hero">
+    <h1>Find Jobs that Fit Your Passion</h1>
+    <p>Explore top opportunities in various fields like Web Development, Design, Editing, and more. Get hired through Flexora's seamless hiring experience.</p>
+  </section>
+
+  <section class="job-sections">
+    <div class="job-card">
+      <h2>Web Development</h2>
+      <ul>
+        <li>Frontend Developer (React/Next.js)</li>
+        <li>Backend Developer (Node.js, MongoDB)</li>
+        <li>WordPress Expert</li>
+      </ul>
+      <a href="#" class="btn-apply">Apply Now</a>
+    </div>
+
+    <div class="job-card">
+      <h2>Graphic Designing</h2>
+      <ul>
+        <li>Logo & Branding Design</li>
+        <li>UI/UX Designer</li>
+        <li>Social Media Post Designer</li>
+      </ul>
+      <a href="#" class="btn-apply">Apply Now</a>
+    </div>
+
+    <div class="job-card">
+      <h2>Video Editing</h2>
+      <ul>
+        <li>Reels & Short-form Editors</li>
+        <li>YouTube Video Editor</li>
+        <li>Motion Graphics Specialist</li>
+      </ul>
+      <a href="#" class="btn-apply">Apply Now</a>
+    </div>
+
+    <div class="job-card">
+      <h2>Content Writing</h2>
+      <ul>
+        <li>SEO Blog Writer</li>
+        <li>Copywriter for Ads</li>
+        <li>Technical Writer</li>
+      </ul>
+      <a href="#" class="btn-apply">Apply Now</a>
+    </div>
+
+    <div class="job-card">
+      <h2>Digital Marketing</h2>
+      <ul>
+        <li>Performance Marketer</li>
+        <li>Social Media Strategist</li>
+        <li>Email Marketing Specialist</li>
+      </ul>
+      <a href="#" class="btn-apply">Apply Now</a>
+    </div>
+
+    <div class="job-card">
+      <h2>App Development</h2>
+      <ul>
+        <li>Flutter Developer</li>
+        <li>Android Native Developer</li>
+        <li>iOS Swift Developer</li>
+      </ul>
+      <a href="#" class="btn-apply">Apply Now</a>
+    </div>
+  </section>
+</body>
+</html>

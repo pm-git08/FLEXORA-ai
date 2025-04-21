@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Freelancer Admin Panel - Themed</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"
+      defer
+    ></script>
+    <script src="script.js" defer></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      /* === THEME VARIABLES === */
+      :root {
+        /* --- Dark Theme (Default) --- */
+        --primary-color: #8a2be2; /* Main Purple Accent (BlueViolet) */
+        --primary-light: #a45eff; /* Lighter Purple for hover */
+        --primary-darker: #6a1eaa; /* Darker Purple for active states */
+        --primary-bg-tint: rgba(138, 43, 226, 0.1); /* Tint for backgrounds */
+
+        --bg-color: #121212; /* Very dark grey (near black) */
+        --sidebar-bg: #0d0d0d; /* Slightly darker for sidebar */
+        --widget-bg: #1e1e1e; /* Dark grey for cards */
+        --widget-bg-hover: #2a2a2a; /* Slightly lighter on hover */
+        --border-color: #3a3a4a; /* Muted border */
+        --border-accent: var(--primary-color); /* Purple accent border */
+
+        --text-color: #e0e0e6; /* Light grey text */
+        --text-muted: #9090a0; /* Muted grey text */
+        --text-heading: #ffffff; /* White for main headings */
+        --text-link: var(--primary-light); /* Purple for links */
+
+        --shadow-color: rgba(0, 0, 0, 0.2); /* Subtle shadow */
+
+        /* Status colors (mostly unchanged, check contrast) */
+        --status-pending: #ffa500;
+        --status-approved: #28a745;
+        --status-sent: #17a2b8;
+        --status-active: #0dcaf0;
+        --status-completed: #198754;
+        --status-disputed: #ffc107;
+        --status-cancelled: #6c757d;
+        --status-suspended: #dc3545;
+        --status-open: #6f42c1;
+        --status-text-dark-bg: #333; /* Text for yellow/light status bg */
+        --status-text-light-bg: #fff;
+      }
+
+      .light-theme {
+        /* --- Light Theme --- */
+        --primary-color: #6a1eaa; /* Darker Purple for better contrast */
+        --primary-light: #8a2be2; /* Original Purple */
+        --primary-darker: #4a0e7e; /* Even Darker Purple */
+        --primary-bg-tint: rgba(138, 43, 226, 0.08);
+
+        --bg-color: #f4f7fc; /* Light grey-blue background */
+        --sidebar-bg: #e9edf5; /* Slightly darker sidebar */
+        --widget-bg: #ffffff; /* White cards */
+        --widget-bg-hover: #fdfdfd;
+        --border-color: #d1d9e6; /* Medium grey border */
+        --border-accent: var(--primary-color);
+
+        --text-color: #333740; /* Dark grey text */
+        --text-muted: #666a73; /* Medium grey text */
+        --text-heading: #111827; /* Near black for headings */
+        --text-link: var(--primary-color);
+
+        --shadow-color: rgba(100, 100, 150, 0.1); /* Lighter shadow */
+
+        /* Adjust status colors if needed for light theme contrast */
+        --status-text-dark-bg: #fff; /* Text for dark status bg */
+        --status-text-light-bg: #fff;
+        /* Example: Make yellow text darker */
+        --status-disputed: #e6a000;
+        --status-text-dark-bg: #583d00; /* Darker text for yellow */
+      }
+
+      /* === Base Styles === */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease; /* Theme transition */
+        font-size: 15px; /* Base font size */
+        line-height: 1.6;
+      }
+
+      /* === Layout === */
+      .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 240px;
+        background-color: var(--sidebar-bg);
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-right: 1px solid var(--border-color);
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          width 0.3s ease;
+      }
+      .main-content {
+        flex: 1;
+        padding: 25px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background-color: var(--bg-color);
+        transition: background-color 0.3s ease;
+      }
+      .views-container {
+        margin-top: 25px;
+      }
+
+      /* === Sidebar Elements === */
+      .sidebar .logo {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 40px;
+        background-color: var(--widget-bg);
+        padding: 10px 15px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .sidebar nav ul {
+        list-style: none;
+        width: 100%;
+        padding: 0 15px;
+      }
+      .sidebar nav ul li {
+        margin-bottom: 10px;
+      } /* Reduced margin */
+      .sidebar nav ul li a {
+        color: var(--text-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 12px 18px;
+        border-radius: 6px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .sidebar nav ul li a span:first-child {
+        /* Icon */
+        margin-right: 12px;
+        font-size: 1.2em;
+        min-width: 20px;
+        text-align: center;
+      }
+      .sidebar nav ul li a .nav-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 1;
+        font-weight: 500;
+      }
+      .sidebar nav ul li.active a {
+        background-color: var(--primary-bg-tint);
+        color: var(--primary-light);
+        font-weight: 600;
+      }
+      .sidebar nav ul li a:hover {
+        background-color: var(--widget-bg);
+        color: var(--text-link);
+      }
+      .sidebar nav ul li.active a:hover {
+        background-color: var(--primary-bg-tint);
+        color: var(--primary-light);
+      } /* Keep active style on hover */
+
+      /* === Header Elements === */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+        transition: border-color 0.3s ease;
+      }
+      .header h1 {
+        color: var(--text-heading);
+        font-weight: 600;
+        font-size: 1.8em;
+        transition: color 0.3s ease;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .header-right input[type="search"] {
+        padding: 9px 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--widget-bg);
+        color: var(--text-color);
+        min-width: 220px;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          color 0.3s ease;
+      }
+      .header-right input[type="search"]::placeholder {
+        color: var(--text-muted);
+      }
+      .header-right .icon-button {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.4em;
+        cursor: pointer;
+        padding: 5px;
+        transition: color 0.2s ease;
+      }
+      .header-right .icon-button:hover {
+        color: var(--primary-light);
+      }
+      .user-profile img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--border-accent);
+        display: block;
+      }
+
+      /* === Theme Toggle Button === */
+      #theme-toggle {
+        overflow: hidden; /* Hide the icon not currently shown */
+      }
+      #theme-toggle .theme-icon-sun,
+      #theme-toggle .theme-icon-moon {
+        display: none; /* Hide both initially */
+      }
+      /* Show sun icon in dark mode */
+      body:not(.light-theme) #theme-toggle .theme-icon-sun {
+        display: inline;
+      }
+      /* Show moon icon in light mode */
+      body.light-theme #theme-toggle .theme-icon-moon {
+        display: inline;
+      }
+
+      /* === Widgets === */
+      .widgets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+      }
+      .widget {
+        background-color: var(--widget-bg);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        border-top: 3px solid transparent; /* Room for accent border */
+        box-shadow: 0 3px 10px -3px var(--shadow-color);
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          box-shadow 0.3s ease, border-top-color 0.3s ease;
+      }
+      .widget:hover {
+        background-color: var(--widget-bg-hover);
+        border-color: var(--border-accent);
+      } /* Subtle hover */
+      .widget h2 {
+        font-size: 1.1em;
+        margin-bottom: 18px;
+        color: var(--text-muted);
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      /* Add Purple Accent Border to Widgets */
+      .widget.kpi-card,
+      .widget.progress-widget,
+      .widget.chart-placeholder,
+      .widget.table-widget,
+      .widget.map-placeholder,
+      .filter-search-area.widget,
+      .settings-form fieldset.widget,
+      .message-list.widget,
+      .message-display.widget {
+        border-top: 3px solid var(--border-accent);
+      }
+
+      /* Specific Widget Types */
+      .kpi-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .kpi-value {
+        font-size: 2.6em;
+        font-weight: 700;
+        color: var(--text-heading);
+        line-height: 1.1;
+        margin-bottom: 6px;
+        transition: color 0.3s ease;
+      }
+      .kpi-label {
+        font-size: 0.9em;
+        color: var(--text-muted);
+        transition: color 0.3s ease;
+      }
+      .map-content,
+      .chart-content {
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        border: 1px dashed var(--border-color);
+        border-radius: 4px;
+        margin-top: 10px;
+        font-style: italic;
+        transition: border-color 0.3s ease, color 0.3s ease;
+      }
+      .progress-widget .progress-circle-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 150px;
+      }
+      /* Circular Progress SVG */
+      .circular-chart {
+        display: block;
+        margin: 10px auto;
+        max-width: 80%;
+        max-height: 200px;
+      }
+      .circle-bg {
+        fill: none;
+        stroke: var(--border-color);
+        stroke-width: 3;
+        transition: stroke 0.3s ease;
+      } /* Use border color for bg */
+      .circle {
+        fill: none;
+        stroke-width: 3.2;
+        stroke: var(--primary-color);
+        stroke-linecap: round;
+        transition: stroke 0.3s ease;
+      }
+      .percentage {
+        fill: var(--text-heading);
+        font-size: 0.5em;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        font-weight: 600;
+        transition: fill 0.3s ease;
+      }
+      .progress-label {
+        font-size: 0.8em;
+        color: var(--text-muted);
+        margin-top: 10px;
+        text-align: center;
+        transition: color 0.3s ease;
+      }
+
+      /* === Tables === */
+      .table-widget table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      .table-widget th,
+      .table-widget td {
+        padding: 14px 12px; /* Slightly more padding */
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95em;
+        vertical-align: middle; /* Align vertically */
+        transition: border-color 0.3s ease;
+      }
+      .table-widget th {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        border-bottom-width: 2px; /* Thicker bottom border */
+      }
+      .table-widget tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .table-widget tbody tr {
+        transition: background-color 0.2s ease;
+      }
+      .table-widget tbody tr:hover {
+        background-color: var(--widget-bg-hover);
+      }
+      /* Status Badges */
+      .status {
+        padding: 4px 10px; /* Slightly larger padding */
+        border-radius: 12px; /* Pill shape */
+        font-size: 0.75em; /* Smaller text */
+        font-weight: 600; /* Bolder text */
+        color: var(--status-text-light-bg); /* Default white text */
+        text-transform: uppercase;
+        display: inline-block; /* Needed for padding */
+        white-space: nowrap;
+      }
+      .status.pending {
+        background-color: var(--status-pending);
+        color: var(--status-text-dark-bg);
+      }
+      .status.approved {
+        background-color: var(--status-approved);
+      }
+      .status.sent {
+        background-color: var(--status-sent);
+      }
+      .status.active {
+        background-color: var(--status-active);
+        color: var(--status-text-dark-bg);
+      }
+      .status.completed {
+        background-color: var(--status-completed);
+      }
+      .status.disputed {
+        background-color: var(--status-disputed);
+        color: var(--status-text-dark-bg);
+      }
+      .status.cancelled {
+        background-color: var(--status-cancelled);
+      }
+      .status.suspended {
+        background-color: var(--status-suspended);
+      }
+      .status.open {
+        background-color: var(--status-open);
+      }
+
+      /* === View Switching & Animation === */
+      .view-section {
+        display: block;
+        animation: fadeIn 0.4s ease-in-out;
+      }
+      .view-hidden {
+        display: none;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* === Detailed Section Styles (Using Variables) === */
+      .filter-search-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        border-top: none;
+      } /* Remove widget style */
+      .filter-search-area input[type="text"],
+      .filter-search-area select {
+        padding: 9px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        flex-grow: 1;
+        min-width: 150px;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          color 0.3s ease;
+      }
+      .filter-search-area select {
+        flex-grow: 0;
+        min-width: 120px;
+      }
+      .filter-search-area button.filter-button {
+        padding: 9px 18px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-weight: 500;
+      }
+      .filter-search-area button.filter-button:hover {
+        background-color: var(--primary-darker);
+      }
+
+      .action-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.2em;
+        cursor: pointer;
+        padding: 3px 6px;
+        margin: 0 2px;
+        border-radius: 4px;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        vertical-align: middle;
+      } /* Align with text */
+      .action-btn:hover {
+        color: var(--primary-light);
+        background-color: var(--primary-bg-tint);
+      }
+
+      .pagination-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 25px;
+        gap: 12px;
+        color: var(--text-muted);
+        font-size: 0.9em;
+        transition: color 0.3s ease;
+      }
+      .pagination-area button {
+        padding: 6px 12px;
+        background-color: var(--widget-bg);
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .pagination-area button:hover {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+      .pagination-area button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: var(--border-color);
+        border-color: var(--border-color);
+      }
+
+      /* Message Layout */
+      .message-layout {
+        display: flex;
+        gap: 20px;
+        max-height: calc(100vh - 240px); /* Adjusted height */
+      }
+      .message-list {
+        flex: 0 0 320px; /* Wider list */
+        overflow-y: auto;
+        border-right: 1px solid var(--border-color);
+        padding-right: 10px;
+        transition: border-color 0.3s ease;
+      }
+      .message-list h3,
+      .message-display h3 {
+        margin: -20px -20px 15px -20px; /* Extend to widget edges */
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 1.1em;
+        color: var(--text-heading);
+        background-color: var(--widget-bg); /* Match header */
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        transition: border-color 0.3s ease, color 0.3s ease,
+          background-color 0.3s ease;
+      }
+      .message-list ul {
+        list-style: none;
+      }
+      .message-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 8px;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.3s ease;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        align-items: flex-start;
+      }
+      .message-item:last-child {
+        border-bottom: none;
+      }
+      .message-item:hover,
+      .message-item.active {
+        background-color: var(--primary-bg-tint);
+      }
+      .message-item.unread strong {
+        font-weight: 600;
+        color: var(--text-link);
+      }
+      .message-item img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+      .message-item div {
+        flex-grow: 1;
+        overflow: hidden;
+      } /* Prevent stretching */
+      .message-item div strong {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 4px;
+        font-weight: 500;
+        color: var(--text-color);
+        transition: color 0.3s ease;
+      }
+      .message-item div p {
+        font-size: 0.85em;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
+        transition: color 0.3s ease;
+      }
+      .message-item .timestamp {
+        font-size: 0.75em;
+        color: var(--text-muted);
+        white-space: nowrap;
+        padding-left: 10px;
+        align-self: flex-start;
+        transition: color 0.3s ease;
+      }
+      .message-display {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .message-content {
+        flex-grow: 1;
+        overflow-y: auto;
+        margin-bottom: 15px;
+        line-height: 1.6;
+        padding: 10px;
+      }
+      .message-content p {
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        max-width: 80%;
+        word-wrap: break-word; /* Wrap long words */
+      }
+      .message-content .admin-reply {
+        text-align: left; /* Admin replies align left too */
+        color: var(--text-color);
+        background-color: var(--primary-bg-tint);
+        border-radius: 12px 12px 0 12px;
+        float: right;
+        clear: both;
+        margin-left: auto; /* Push right */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .message-content p:not(.admin-reply) {
+        background-color: var(--widget-bg-hover);
+        color: var(--text-color);
+        border-radius: 12px 12px 12px 0;
+        float: left;
+        clear: both;
+        margin-right: auto; /* Push left */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .message-content strong {
+        font-weight: 600;
+        color: var(--text-muted);
+      } /* Style sender name */
+      .message-reply-area {
+        border-top: 1px solid var(--border-color);
+        padding-top: 15px;
+        transition: border-color 0.3s ease;
+      }
+      .message-reply-area textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-height: 80px;
+        margin-bottom: 10px;
+        resize: vertical;
+        font-size: 0.95em;
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          color 0.3s ease;
+      }
+      .message-reply-area button {
+        padding: 9px 18px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        float: right;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+      }
+      .message-reply-area button:hover {
+        background-color: var(--primary-darker);
+      }
+
+      /* Settings Form */
+      .settings-form fieldset.widget {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 25px;
+        padding: 30px 25px 25px 25px;
+        background: none;
+        position: relative;
+        transition: border-color 0.3s ease;
+        border-top-width: 3px; /* Use top border instead */
+        border-top-color: var(--border-accent);
+      }
+      .settings-form legend {
+        font-size: 1.05em;
+        font-weight: 600;
+        color: var(--primary-light);
+        padding: 0 10px;
+        position: absolute;
+        top: -0.75em;
+        left: 20px;
+        background-color: var(--widget-bg);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 15px; /* Row and column gap */
+      }
+      .form-group label:not(.switch) {
+        flex-basis: 220px;
+        text-align: right;
+        padding-right: 15px;
+        color: var(--text-muted);
+        font-size: 0.9em;
+        font-weight: 500;
+        flex-shrink: 0;
+        transition: color 0.3s ease;
+      }
+      .form-group input[type="text"],
+      .form-group input[type="email"],
+      .form-group input[type="number"],
+      .form-group select,
+      .form-group textarea {
+        flex-grow: 1;
+        padding: 10px 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-width: 200px;
+        font-size: 0.95em;
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          color 0.3s ease;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 75px;
+      }
+      /* Toggle Switch Styles */
+      .form-group label.switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        flex-basis: auto;
+        margin-left: auto;
+      }
+      .form-group label.switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--border-color);
+        transition: 0.4s;
+      } /* Use border color for off state */
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+      }
+      input:checked + .slider {
+        background-color: var(--primary-color);
+      }
+      input:focus + .slider {
+        box-shadow: 0 0 2px var(--primary-color);
+      }
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+      .slider.round {
+        border-radius: 24px;
+      }
+      .slider.round:before {
+        border-radius: 50%;
+      }
+      .form-actions {
+        margin-top: 20px;
+        text-align: right;
+      }
+      .form-actions button.save-button {
+        padding: 10px 22px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+      }
+      .form-actions button.save-button:hover {
+        background-color: var(--primary-darker);
+      }
+
+      /* === Responsive Adjustments === */
+      @media (max-width: 992px) {
+        .widget.large-widget,
+        .widget.map-placeholder,
+        .widget.table-widget {
+          grid-column: span 1;
+        }
+        .form-group label:not(.switch) {
+          flex-basis: 150px;
+        } /* Smaller label basis */
+      }
+
+      @media (max-width: 768px) {
+        body {
+          font-size: 14px;
+        }
+        .dashboard-container {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          height: auto;
+          flex-direction: row;
+          justify-content: space-around;
+          padding: 8px 0;
+          border-right: none;
+          border-bottom: 1px solid var(--border-color);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          background-color: var(--sidebar-bg);
+        } /* Ensure bg color */
+        .sidebar .logo {
+          display: none;
+        }
+        .sidebar nav ul {
+          gap: 0;
+        } /* Remove gap */
+        .sidebar nav ul li a {
+          padding: 8px 10px;
+        } /* Adjust padding */
+        .sidebar nav ul li a span:first-child {
+          margin-right: 0;
+          font-size: 1.3em;
+        } /* Icon only effectively */
+        .sidebar nav ul li a .nav-text {
+          display: none;
+        }
+
+        .main-content {
+          padding: 15px;
+        }
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .header h1 {
+          font-size: 1.5em;
+        }
+        .header-right {
+          width: 100%;
+          justify-content: space-between;
+        }
+        .header-right input[type="search"] {
+          flex-grow: 1;
+          min-width: 120px;
+        }
+
+        .widgets-grid {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        .widget {
+          padding: 15px;
+        }
+        .widget.large-widget,
+        .widget.map-placeholder,
+        .widget.table-widget,
+        .widget.chart-placeholder,
+        .widget.progress-widget {
+          grid-column: auto !important;
+          grid-row: auto !important;
+        } /* Reset grid spans */
+        .kpi-value {
+          font-size: 2.2em;
+        }
+        .table-widget th,
+        .table-widget td {
+          padding: 10px 8px;
+          font-size: 0.9em;
+        }
+
+        .message-layout {
+          flex-direction: column;
+          max-height: none;
+        }
+        .message-list {
+          flex-basis: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border-color);
+          padding-right: 0;
+          max-height: 30vh;
+        }
+        .message-content p,
+        .message-content .admin-reply {
+          max-width: 95%;
+        }
+
+        .filter-search-area {
+          gap: 10px;
+        }
+        .filter-search-area input,
+        .filter-search-area select {
+          min-width: calc(50% - 10px);
+        } /* Two inputs per row */
+
+        .form-group label:not(.switch) {
+          flex-basis: 100%;
+          text-align: left;
+          padding-right: 0;
+          margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+          min-width: 100%;
+        }
+        .form-group label.switch {
+          margin-left: 0;
+        }
+      }
+
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: inherit; /* inherits text color */
+        margin-left: 20px;
+      }
+
+      
+
+    .map-placeholder h2 {
+      margin-bottom: 16px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .map-content {
+      height: 400px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    .chart-content {
+    position: relative;
+    height: 400px;
+    width: 100%;
+  }
+
+
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <aside class="sidebar">
+        <div class="logo">FW</div>
+        <nav>
+          <ul>
+            <li class="active" data-view="dashboard-view">
+              <a href="#"
+                ><span>📊</span> <span class="nav-text">Dashboard</span></a
+              >
+            </li>
+            <li data-view="users-view">
+              <a href="#"
+                ><span>👥</span> <span class="nav-text">Users</span></a
+              >
+            </li>
+            <li data-view="projects-view">
+              <a href="#"
+                ><span>💼</span> <span class="nav-text">Projects</span></a
+              >
+            </li>
+            <li data-view="messages-view">
+              <a href="#"
+                ><span>💬</span> <span class="nav-text">Messages</span></a
+              >
+            </li>
+            <li data-view="settings-view">
+              <a href="#"
+                ><span>⚙️</span> <span class="nav-text">Settings</span></a
+              >
+            </li>
+            <button
+              onclick="logoutUser()"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: none;
+                border: none;
+                cursor: pointer;
+              "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                class="user-icon"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
+                />
+              </svg>
+              Logout
+            </button>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <header class="header">
+          <h1 id="main-title">Dashboard</h1>
+          <div class="header-right">
+            <input type="search" placeholder="Global Search..." />
+            <button class="icon-button" title="Notifications">🔔</button>
+
+            <button id="theme-toggle" class="icon-button" title="Toggle Theme">
+              <span class="theme-icon-sun">☀️</span>
+              <span class="theme-icon-moon">🌙</span>
+            </button>
+            <div class="user-profile">
+              <img
+                src="placeholder-user.png"
+                alt="User Avatar"
+                title="Admin User"
+              />
+            </div>
+          </div>
+        </header>
+
+        <div class="views-container">
+          <section id="dashboard-view" class="view-section">
+            <div class="widgets-grid">
+              <div class="widget kpi-card" title="Total projects ever created">
+                <span class="kpi-value" data-target="20510">0</span>
+                <span class="kpi-label">Total Projects</span>
+              </div>
+              <div
+                class="widget kpi-card"
+                title="Freelancers currently marked as active"
+              >
+                <span class="kpi-value" data-target="115">0</span>
+                <span class="kpi-label">Active Freelancers</span>
+              </div>
+              <div
+                class="widget kpi-card"
+                title="New client signups this month"
+              >
+                <span class="kpi-value" data-target="142">0</span>
+                <span class="kpi-label">New Clients (Month)</span>
+              </div>
+              <div
+                class="widget kpi-card"
+                title="Proposals awaiting client action or admin review"
+              >
+                <span class="kpi-value" data-target="38">0</span>
+                <span class="kpi-label">Pending Proposals</span>
+              </div>
+              <div class="widget large-widget map-placeholder">
+                <h2 style="color: #b8afaf;">Platform Activity Geo</h2>
+                <div class="map-content">
+                  <div id="map"></div>
+                </div>
+              </div>
+              
+              <div class="widget progress-widget">
+                <h2>Project Completion Rate</h2>
+                <div class="progress-circle-placeholder">
+                  <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      stroke-dasharray="72, 100"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="18" class="percentage" dy=".3em">72%</text>
+                  </svg>
+                  <div class="progress-label">
+                    Completed / (Completed + Active)
+                  </div>
+                </div>
+              </div>
+              <div class="widget chart-placeholder">
+                <h2>User Signups (Monthly)</h2>
+                <div class="chart-content">
+                  <canvas id="userSignupsChart" width="400" height="200"></canvas>
+                </div>
+              </div>
+              <div class="widget table-widget">
+                <h2>Recent Activity</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>User/Project</th>
+                      <th>Details</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>New Project</td>
+                      <td>Web Design Gig</td>
+                      <td>Client C</td>
+                      <td>2025-04-14</td>
+                      <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                      <td>New Freelancer</td>
+                      <td>Jane Doe</td>
+                      <td>UX Designer</td>
+                      <td>2025-04-13</td>
+                      <td><span class="status approved">Approved</span></td>
+                    </tr>
+                    <tr>
+                      <td>Proposal</td>
+                      <td>Logo for ACME</td>
+                      <td>Freelancer X</td>
+                      <td>2025-04-13</td>
+                      <td><span class="status sent">Sent</span></td>
+                    </tr>
+                    <tr>
+                      <td>Payment</td>
+                      <td>Project #101</td>
+                      <td>₹40,000 Received</td>
+                      <td>2025-04-12</td>
+                      <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td>Milestone</td>
+                      <td>E-commerce Site</td>
+                      <td>Phase 1 Approved</td>
+                      <td>2025-04-11</td>
+                      <td><span class="status active">Active</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="users-view" class="view-section view-hidden">
+            <h2>Manage Users</h2>
+            <div class="filter-search-area widget">
+              <input
+                type="text"
+                id="user-search"
+                placeholder="Search by name or email..."
+              /><select id="user-type-filter">
+                <option value="">All Types</option>
+                <option value="freelancer">Freelancer</option>
+                <option value="client">Client</option></select
+              ><select id="user-status-filter">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending Approval</option>
+                <option value="suspended">Suspended</option></select
+              ><button class="filter-button">Apply Filters</button>
+            </div>
+            <div class="widget table-widget">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Type</th>
+                    <th>Joined Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>USR-101</td>
+                    <td>Alice Smith</td>
+                    <td>alice@mail.com</td>
+                    <td>Client</td>
+                    <td>2025-03-10</td>
+                    <td><span class="status approved">Active</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Profile">
+                        👁️
+                      </button>
+                      <button
+                        class="action-btn suspend-btn"
+                        title="Suspend User"
+                      >
+                        🚫
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>USR-102</td>
+                    <td>Bob Johnson</td>
+                    <td>bob.j@mail.com</td>
+                    <td>Freelancer</td>
+                    <td>2025-04-01</td>
+                    <td><span class="status pending">Pending</span></td>
+                    <td>
+                      <button
+                        class="action-btn approve-btn"
+                        title="Approve User"
+                      >
+                        ✔️
+                      </button>
+                      <button class="action-btn view-btn" title="View Profile">
+                        👁️
+                      </button>
+                      <button class="action-btn reject-btn" title="Reject User">
+                        ❌
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>USR-103</td>
+                    <td>Charlie Brown</td>
+                    <td>charlie@mail.com</td>
+                    <td>Freelancer</td>
+                    <td>2025-02-15</td>
+                    <td><span class="status approved">Active</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Profile">
+                        👁️
+                      </button>
+                      <button
+                        class="action-btn suspend-btn"
+                        title="Suspend User"
+                      >
+                        🚫
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>USR-104</td>
+                    <td>Diana Prince</td>
+                    <td>diana@client.co</td>
+                    <td>Client</td>
+                    <td>2025-04-11</td>
+                    <td><span class="status approved">Active</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Profile">
+                        👁️
+                      </button>
+                      <button
+                        class="action-btn suspend-btn"
+                        title="Suspend User"
+                      >
+                        🚫
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>USR-105</td>
+                    <td>Ethan Hunt</td>
+                    <td>ethan.h@freelance.net</td>
+                    <td>Freelancer</td>
+                    <td>2024-12-20</td>
+                    <td><span class="status suspended">Suspended</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Profile">
+                        👁️
+                      </button>
+                      <button
+                        class="action-btn reactivate-btn"
+                        title="Reactivate User"
+                      >
+                        🔄
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination-area">
+              <button>&laquo; Prev</button><span>Page 1 of 5</span
+              ><button>Next &raquo;</button>
+            </div>
+          </section>
+
+          <section id="projects-view" class="view-section view-hidden">
+            <h2>Manage Projects</h2>
+            <div class="filter-search-area widget">
+              <input
+                type="text"
+                id="project-search"
+                placeholder="Search by title or ID..."
+              /><select id="project-category-filter">
+                <option value="">All Categories</option>
+                <option value="webdev">Web Development</option>
+                <option value="design">Graphic Design</option>
+                <option value="writing">Writing</option>
+                <option value="marketing">Marketing</option></select
+              ><select id="project-status-filter">
+                <option value="">All Statuses</option>
+                <option value="open">Open for Proposals</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="disputed">Disputed</option>
+                <option value="cancelled">Cancelled</option></select
+              ><button class="filter-button">Apply Filters</button>
+            </div>
+            <div class="widget table-widget">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Client</th>
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Posted Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>PRJ-001</td>
+                    <td>E-commerce Site</td>
+                    <td>Client Corp (USR-104)</td>
+                    <td>Web Development</td>
+                    <td>₹4,15,000</td>
+                    <td>2025-04-10</td>
+                    <td><span class="status active">Active</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Details">
+                        👁️
+                      </button>
+                      <button class="action-btn flag-btn" title="Flag Project">
+                        🚩
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>PRJ-002</td>
+                    <td>Mobile App UI</td>
+                    <td>Startup Inc (USR-101)</td>
+                    <td>Graphic Design</td>
+                    <td>₹1,25,000</td>
+                    <td>2025-04-05</td>
+                    <td><span class="status completed">Completed</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Details">
+                        👁️
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>PRJ-003</td>
+                    <td>Blog Post Series</td>
+                    <td>Marketing Ltd (USR-XXX)</td>
+                    <td>Writing</td>
+                    <td>₹65,000</td>
+                    <td>2025-04-12</td>
+                    <td><span class="status open">Open</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Details">
+                        👁️
+                      </button>
+                      <button
+                        class="action-btn remove-btn"
+                        title="Remove Listing"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>PRJ-004</td>
+                    <td>Social Media Campaign</td>
+                    <td>Client Corp (USR-104)</td>
+                    <td>Marketing</td>
+                    <td>₹1,65,000</td>
+                    <td>2025-03-28</td>
+                    <td><span class="status disputed">Disputed</span></td>
+                    <td>
+                      <button class="action-btn view-btn" title="View Details">
+                        👁️
+                      </button>
+                      <button
+                        class="action-btn resolve-btn"
+                        title="Resolve Dispute"
+                      >
+                        ⚖️
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination-area">
+              <button>&laquo; Prev</button><span>Page 1 of 3</span
+              ><button>Next &raquo;</button>
+            </div>
+          </section>
+
+          <section id="messages-view" class="view-section view-hidden">
+            <h2>Messages / Support</h2>
+            <div class="message-layout">
+              <div class="message-list widget">
+                <h3>Conversations</h3>
+                <ul>
+                  <li class="message-item active">
+                    <img src="placeholder-user.png" alt="User" />
+                    <div>
+                      <strong>Support Ticket #1023</strong>
+                      <p>Issue with payment gateway...</p>
+                    </div>
+                    <span class="timestamp">1h ago</span>
+                  </li>
+                  <li class="message-item">
+                    <img src="placeholder-user.png" alt="User" />
+                    <div>
+                      <strong>Alice Smith (Client)</strong>
+                      <p>Question about project PRJ-002</p>
+                    </div>
+                    <span class="timestamp">3h ago</span>
+                  </li>
+                  <li class="message-item unread">
+                    <img src="placeholder-user.png" alt="User" />
+                    <div>
+                      <strong>Bob Johnson (Freelancer)</strong>
+                      <p>Milestone submission for PRJ-001</p>
+                    </div>
+                    <span class="timestamp">Yesterday</span>
+                  </li>
+                  <li class="message-item">
+                    <img src="placeholder-user.png" alt="User" />
+                    <div>
+                      <strong>System Notification</strong>
+                      <p>New user pending approval...</p>
+                    </div>
+                    <span class="timestamp">2 days ago</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="message-display widget">
+                <h3>Ticket #1023 - Payment Issue</h3>
+                <div class="message-content">
+                  <p>
+                    <strong>User (USR-104):</strong> I tried to pay the
+                    milestone for PRJ-001 but got an error message. Can you
+                    please check?
+                  </p>
+                  <p class="admin-reply">
+                    <strong>Admin:</strong> Checking on this now. Could you
+                    provide the exact error message you received?
+                  </p>
+                </div>
+                <div class="message-reply-area">
+                  <textarea placeholder="Type your reply here..."></textarea
+                  ><button>Send Reply</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="settings-view" class="view-section view-hidden">
+            <h2>Admin Settings</h2>
+            <form class="settings-form">
+              <fieldset class="widget">
+                <legend>General Settings</legend>
+                <div class="form-group">
+                  <label for="platform-name">Platform Name:</label
+                  ><input
+                    type="text"
+                    id="platform-name"
+                    value="Freelance World"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="admin-email">Admin Email:</label
+                  ><input
+                    type="email"
+                    id="admin-email"
+                    value="admin@freelanceworld.com"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="maintenance-mode">Maintenance Mode:</label
+                  ><label class="switch"
+                    ><input type="checkbox" id="maintenance-mode" /><span
+                      class="slider round"
+                    ></span
+                  ></label>
+                </div>
+              </fieldset>
+              <fieldset class="widget">
+                <legend>Financial Settings</legend>
+                <div class="form-group">
+                  <label for="commission-rate">Commission Rate (%):</label
+                  ><input
+                    type="number"
+                    id="commission-rate"
+                    value="15"
+                    min="0"
+                    max="50"
+                    step="1"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="currency">Default Currency:</label
+                  ><select id="currency">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="INR" selected>INR (₹)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="payout-schedule">Payout Schedule:</label
+                  ><select id="payout-schedule">
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Bi-Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+              </fieldset>
+              <fieldset class="widget">
+                <legend>Content Settings</legend>
+                <div class="form-group">
+                  <label for="forbidden-keywords"
+                    >Forbidden Keywords (comma-separated):</label
+                  ><textarea id="forbidden-keywords" rows="3">
+word1, phrase2, example</textarea
+                  >
+                </div>
+                <div class="form-group">
+                  <label for="auto-approve-projects"
+                    >Auto-Approve Projects:</label
+                  ><label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="auto-approve-projects"
+                      checked /><span class="slider round"></span
+                  ></label>
+                </div>
+              </fieldset>
+              <div class="form-actions">
+                <button type="submit" class="save-button">
+                  💾 Save All Settings
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("Admin Panel Loaded - Themed");
+
+        const themeToggleButton = document.getElementById("theme-toggle");
+        const currentTheme = localStorage.getItem("theme"); // Check saved theme
+
+        // Apply saved theme on initial load
+        if (currentTheme === "light") {
+          document.body.classList.add("light-theme");
+        } else {
+          // Default to dark if no setting or setting is 'dark'
+          document.body.classList.remove("light-theme"); // Ensure dark if no setting
+        }
+
+        // --- Theme Toggling Logic ---
+        if (themeToggleButton) {
+          themeToggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("light-theme"); // Toggle the class on body
+
+            // Save the current theme preference to localStorage
+            let theme = "dark"; // Default
+            if (document.body.classList.contains("light-theme")) {
+              theme = "light";
+            }
+            localStorage.setItem("theme", theme);
+
+            console.log(`Theme changed to: ${theme}`);
+          });
+        }
+
+        // --- GSAP Animation for KPI Numbers ---
+        function animateKpiNumbers() {
+          const kpiValues = document.querySelectorAll(
+            "#dashboard-view .kpi-value"
+          );
+          kpiValues.forEach((kpi) => {
+            // Check if animation is already running or has run
+            if (kpi.dataset.animated === "true") return;
+            kpi.dataset.animated = "true"; // Mark as animated
+
+            const targetValue = parseInt(kpi.getAttribute("data-target"), 10);
+            const kpiCounter = { value: 0 }; // Start from 0
+
+            // Ensure initial text is 0 before animation
+            kpi.textContent = "0";
+
+            gsap.to(kpiCounter, {
+              value: targetValue,
+              duration: 1.5,
+              ease: "power1.inOut",
+              onUpdate: function () {
+                // Format with commas during animation (using Indian locale as requested)
+                kpi.textContent = Math.round(kpiCounter.value).toLocaleString(
+                  "en-IN"
+                );
+              },
+              // Ensure final value is exactly the target and formatted
+              onComplete: function () {
+                kpi.textContent = targetValue.toLocaleString("en-IN");
+              },
+            });
+          });
+        }
+
+        // --- View Switching Logic ---
+        const sidebarLinks = document.querySelectorAll(".sidebar nav ul li");
+        const viewSections = document.querySelectorAll(".view-section");
+        const mainTitle = document.getElementById("main-title");
+
+        function showView(viewId) {
+          viewSections.forEach((section) =>
+            section.classList.add("view-hidden")
+          );
+          const targetView = document.getElementById(viewId);
+          if (targetView) {
+            targetView.classList.remove("view-hidden");
+            const correspondingLink = document.querySelector(
+              `.sidebar li[data-view='${viewId}'] .nav-text`
+            );
+            if (mainTitle && correspondingLink) {
+              mainTitle.textContent = correspondingLink.textContent;
+            } else if (mainTitle && viewId === "dashboard-view") {
+              mainTitle.textContent = "Dashboard"; // Default if text not found
+            }
+
+            // Re-run animations only if switching back to dashboard
+            if (viewId === "dashboard-view") {
+              // Reset animated flag if you want animations every time dashboard is shown
+              // document.querySelectorAll('#dashboard-view .kpi-value').forEach(kpi => kpi.dataset.animated = 'false');
+              animateKpiNumbers();
+            }
+          } else {
+            console.warn("View not found:", viewId);
+            // Show dashboard by default if target not found?
+            const dashboardView = document.getElementById("dashboard-view");
+            if (dashboardView) {
+              dashboardView.classList.remove("view-hidden");
+              if (mainTitle) mainTitle.textContent = "Dashboard";
+              // Reset animated flag if needed
+              // document.querySelectorAll('#dashboard-view .kpi-value').forEach(kpi => kpi.dataset.animated = 'false');
+              animateKpiNumbers();
+            }
+          }
+        }
+
+        // Add click listeners to sidebar links
+        sidebarLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            // Find the actual list item element as the event target might be a child (span, a)
+            const targetListItem = e.target.closest("li");
+            if (!targetListItem) return; // Exit if click wasn't on or inside a list item
+
+            e.preventDefault(); // Prevent default anchor behavior
+
+            const viewId = targetListItem.getAttribute("data-view");
+
+            if (viewId) {
+              // Update active class on sidebar
+              sidebarLinks.forEach((l) => l.classList.remove("active"));
+              targetListItem.classList.add("active");
+
+              // Show the corresponding view
+              showView(viewId);
+            }
+          });
+        });
+
+        // --- Client-Side Filtering Logic for Users Table (Example) ---
+        const usersFilterButton = document.querySelector(
+          "#users-view .filter-button"
+        );
+        const userSearchInput = document.getElementById("user-search");
+        const userTypeFilter = document.getElementById("user-type-filter");
+        const userStatusFilter = document.getElementById("user-status-filter");
+        const userTableBody = document.querySelector(
+          "#users-view .table-widget tbody"
+        );
+
+        function filterUserTable() {
+          if (!userTableBody) return; // Make sure table body exists
+          const searchTerm = userSearchInput.value.toLowerCase();
+          const typeFilter = userTypeFilter.value; // e.g., "freelancer", "client", ""
+          const statusFilter = userStatusFilter.value; // e.g., "active", "pending", ""
+          const tableRows = userTableBody.querySelectorAll("tr");
+          console.log(
+            `Filtering Users: Search='${searchTerm}', Type='${typeFilter}', Status='${statusFilter}'`
+          );
+          tableRows.forEach((row) => {
+            const nameCell = row.cells[1]?.textContent.toLowerCase() || "";
+            const emailCell = row.cells[2]?.textContent.toLowerCase() || "";
+            const typeCell = row.cells[3]?.textContent || "";
+            // Find status text inside the span
+            const statusSpan = row.cells[5]?.querySelector(".status");
+            const statusCellText = statusSpan
+              ? statusSpan.textContent.toLowerCase()
+              : "";
+            // Determine if the row should be visible
+            let isVisible = true;
+            // Apply Search Filter (Name or Email)
+            if (
+              searchTerm &&
+              !nameCell.includes(searchTerm) &&
+              !emailCell.includes(searchTerm)
+            ) {
+              isVisible = false;
+            }
+            // Apply Type Filter
+            if (
+              isVisible &&
+              typeFilter &&
+              typeCell.toLowerCase() !== typeFilter.toLowerCase()
+            ) {
+              // Compare lower case
+              isVisible = false;
+            }
+            // Apply Status Filter
+            if (
+              isVisible &&
+              statusFilter &&
+              statusCellText !== statusFilter.toLowerCase()
+            ) {
+              // Compare lower case
+              isVisible = false;
+            }
+            // Show or hide the row
+            row.style.display = isVisible ? "" : "none"; // '' reverts to default (usually table-row)
+          });
+        }
+        if (usersFilterButton) {
+          usersFilterButton.addEventListener("click", filterUserTable);
+        }
+
+        // --- Placeholder Event Listeners using Event Delegation ---
+        document.body.addEventListener("click", function (event) {
+          // Filter buttons (User view already handled above, add for Projects if needed)
+          if (event.target.matches("#projects-view .filter-button")) {
+            console.log(
+              "Project Filter button clicked - Add filtering logic here."
+            );
+          }
+          // Pagination buttons
+          if (event.target.matches(".pagination-area button")) {
+            const direction = event.target.textContent.includes("Prev")
+              ? "Previous"
+              : "Next";
+            console.log(
+              `${direction} Pagination button clicked - Add pagination logic here.`
+            );
+          }
+          // Table action buttons
+          if (event.target.matches(".action-btn")) {
+            const row = event.target.closest("tr");
+            const id = row
+              ? row.querySelector("td:first-child")?.textContent
+              : "N/A";
+            console.log(
+              `Action button (${
+                event.target.title || "Unknown Action"
+              }) clicked for ID: ${id} - Add specific action logic.`
+            );
+          }
+          // Settings Save button
+          if (event.target.matches(".settings-form .save-button")) {
+            event.preventDefault(); // Prevent default form submission for demo
+            console.log(
+              "Save Settings button clicked - Add logic to collect form data and send to backend."
+            );
+            const form = event.target.closest("form");
+            // Code to collect form data (as shown before) can be added here
+            if (form) {
+              const formData = new FormData(form);
+              const settingsData = {};
+              formData.forEach((value, key) => {
+                const element = form.querySelector(`[id="${key}"]`);
+                if (element && element.type === "checkbox") {
+                  settingsData[key] = element.checked;
+                } else {
+                  settingsData[key] = value;
+                }
+              });
+              console.log("Settings Data to Save:", settingsData);
+            }
+          }
+          // Message List Item click
+          const messageItem = event.target.closest(".message-item");
+          if (messageItem && !event.target.closest("button")) {
+            // Ensure click is not on a button inside item
+            // Remove active class from others, add to clicked
+            document
+              .querySelectorAll(".message-item.active")
+              .forEach((el) => el.classList.remove("active"));
+            messageItem.classList.add("active");
+            // Update display area (placeholder logic)
+            const title =
+              messageItem.querySelector("strong")?.textContent ||
+              "Conversation";
+            const displayTitle = document.querySelector(".message-display h3");
+            const displayContent = document.querySelector(
+              ".message-display .message-content"
+            );
+            if (displayTitle) displayTitle.textContent = title;
+            if (displayContent)
+              displayContent.innerHTML = `<p>Loading conversation for <strong>${title}</strong>...</p><p><em>(Requires backend integration)</em></p>`; // Placeholder update
+            console.log(
+              `Message item clicked: ${title} - Add logic to load full conversation.`
+            );
+          }
+        });
+
+        // --- Initial Setup ---
+        // Show the default view (dashboard) on load
+        showView("dashboard-view"); // This will also run initial KPI animation
+      }); // End DOMContentLoaded
+
+      function logoutUser() {
+        localStorage.removeItem("userName");
+        window.location.href = "login.html";
+      }
+      
+
+
+      // Initialize map
+    var map = L.map('map').setView([20.5937, 78.9629], 4); // Centered on India
+
+// Add OpenStreetMap tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Example marker (can be customized)
+L.marker([28.6139, 77.2090]).addTo(map) // Delhi
+  .bindPopup('Delhi - User Activity')
+  .openPopup();
+  //chart//
+  const ctx = document.getElementById('userSignupsChart').getContext('2d');
+  const userSignupsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      datasets: [{
+        label: 'Signups',
+        data: [120, 190, 300, 250, 270, 320, 400],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: 'rgba(54, 162, 235, 1)',
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top'
+        },
+        tooltip: {
+          enabled: true
+        }
+      }
+    }
+  });
+    </script>
+  </body>
+</html>

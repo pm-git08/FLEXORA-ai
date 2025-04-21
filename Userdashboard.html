@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Freelancer/Client</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="script.js" defer></script>
+    <style>
+        /* --- Theme Variables (Ensure these are defined at the top) --- */
+:root {
+    --bg-color: #1a1a2e;
+    --widget-bg: #16213e;
+    --sidebar-bg: #0f1624;
+    --border-color: #4a4a5e;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0b0;
+    --primary-color: #8a2be2; /* Purple */
+    --primary-light: #a45eff;
+    --secondary-color: #0dcaf0; /* Light Blue */
+    --accent-color: #ffc107; /* Yellow */
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --light-bg: #f8f9fa;
+    --light-widget-bg: #ffffff;
+    --light-sidebar-bg: #e9ecef;
+    --light-border-color: #dee2e6;
+    --light-text-color: #212529;
+    --light-text-muted: #6c757d;
+}
+
+/* --- Light Theme --- */
+body.light-theme {
+    --bg-color: var(--light-bg);
+    --widget-bg: var(--light-widget-bg);
+    --sidebar-bg: var(--light-sidebar-bg);
+    --border-color: var(--light-border-color);
+    --text-color: var(--light-text-color);
+    --text-muted: var(--light-text-muted);
+    /* Keep primary/accent colors or adjust for light theme */
+}
+
+/* --- Basic Body/Container Styles --- */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* --- Sidebar Styles --- */
+.sidebar {
+    width: 240px;
+    background-color: var(--sidebar-bg);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.sidebar .logo {
+    padding: 15px 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.sidebar nav {
+    flex-grow: 1;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    width: 90%;
+    padding: 0 15px;
+}
+
+.sidebar nav ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar nav ul li a {
+    display: block;
+    padding: 10px 15px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+.sidebar nav ul li a span:first-child {
+    margin-right: 10px;
+}
+
+.sidebar nav ul li.active a {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar-footer {
+    padding: 15px;
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+}
+
+.view-switch-button {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    background-color: var(--widget-bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-align: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.view-switch-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* --- Header Styles --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 1.8em;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--widget-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+.search-container label {
+    margin-right: 5px;
+    color: var(--text-muted);
+}
+
+.search-container input[type="search"] {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.9em;
+    padding: 8px 0;
+    flex-grow: 1;
+    outline: none;
+}
+
+.search-container input[type="search"]::placeholder {
+    color: var(--text-muted);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+.user-profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.user-profile img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* --- Theme Toggle Button Styles --- */
+#theme-toggle {
+    position: relative;
+}
+
+#theme-toggle .theme-icon-sun,
+#theme-toggle .theme-icon-moon {
+    display: inline;
+    font-size: 1.1em;
+}
+
+body.light-theme #theme-toggle .theme-icon-sun {
+    display: inline;
+}
+
+body.light-theme #theme-toggle .theme-icon-moon {
+    display: none;
+}
+
+/* --- Views Container --- */
+.views-container {
+    padding-top: 10px;
+}
+
+.view-section {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.view-hidden {
+    display: none !important;
+}
+
+.subsection {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+    padding-bottom: 20px;
+}
+
+.subsection-hidden {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Widget Grid Layouts --- */
+.widgets-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Example: Customize grid layout for specific views */
+@media (min-width: 992px) {
+    .freelancer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .freelancer-grid .ongoing-projects {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+
+    .freelancer-grid .earnings-chart {
+        grid-column: span 1;
+        grid-row: span 2;
+    }
+
+    .client-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .client-grid .active-client-projects {
+        grid-column: span 2;
+    }
+
+    .client-grid .spending-chart {
+        grid-column: span 2;
+    }
+}
+
+/* --- Widget Styles (General) --- */
+.widget {
+    background-color: var(--widget-bg);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.widget h2 {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    color: var(--text-muted);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.widget-footer {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+    text-align: right;
+}
+
+/* --- KPI Card Styles --- */
+.kpi-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    text-align: center;
+}
+
+.kpi-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.kpi-label {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* --- Table Widget Styles --- */
+.table-widget table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.table-widget th,
+.table-widget td {
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9em;
+    transition: border-color 0.3s ease;
+}
+
+.table-widget th {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.8em;
+    text-transform: uppercase;
+}
+
+.table-widget tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-widget tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.light-theme .table-widget tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Progress bar in table */
+.table-widget progress {
+    width: 80%;
+    height: 8px;
+    vertical-align: middle;
+    margin-right: 5px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.table-widget progress::-webkit-progress-bar {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+.table-widget progress::-webkit-progress-value {
+    background-color: var(--secondary-color);
+    border-radius: 4px;
+}
+
+body.light-theme .table-widget progress::-webkit-progress-bar {
+    background-color: #eee;
+}
+
+body.light-theme .table-widget progress::-webkit-progress-value {
+    background-color: var(--primary-color);
+}
+
+/* Status Tags */
+.status {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 500;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.status.pending {
+    background-color: var(--warning-color);
+    color: #333;
+}
+
+.status.approved,
+.status.active,
+.status.completed,
+.status.hired {
+    background-color: var(--success-color);
+}
+
+.status.sent {
+    background-color: var(--info-color);
+}
+
+.status.viewed {
+    background-color: var(--primary-light);
+}
+
+.status.rejected,
+.status.cancelled,
+.status.disputed {
+    background-color: var(--danger-color);
+}
+
+.status.open {
+    background-color: var(--secondary-color);
+}
+
+body.light-theme .status.pending {
+    background-color: var(--warning-color);
+    color: var(--light-text-color);
+}
+
+/* --- Chart Placeholder --- */
+.chart-placeholder .chart-content {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border: 1px dashed var(--border-color);
+    border-radius: 4px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+/* --- Specific Widget Styles --- */
+.find-work .job-listing {
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+.find-work .job-listing:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.find-work h4 {
+    font-size: 1em;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+.find-work p {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.find-work button {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.find-work button:hover {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+    background-color: rgba(var(--secondary-color-rgb, 13, 202, 240), 0.1);
+}
+
+.post-project {
+    text-align: center;
+}
+
+.post-project p {
+    margin-bottom: 20px;
+    color: var(--text-muted);
+}
+
+.primary-action-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.primary-action-btn:hover {
+    background-color: var(--primary-light);
+}
+
+.widget-link {
+    display: block;
+    margin-top: auto;
+    padding-top: 10px;
+    text-align: right;
+    font-size: 0.9em;
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.widget-link:hover {
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+/* Button styles within tables */
+.action-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 4px 8px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.action-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-light);
+}
+
+.action-btn.hire-btn:hover {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.action-btn.view-btn:hover {
+    border-color: var(--info-color);
+    color: var(--info-color);
+}
+
+/* Messaging Placeholder */
+.messaging-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Profile Form */
+.widget form label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+}
+
+.widget form input[type="text"],
+.widget form input[type="email"],
+.widget form input[type="password"],
+.widget form input[type="number"],
+.widget form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--widget-bg);
+    color: var(--text-color);
+    box-sizing: border-box;
+    font-size: 0.9em;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.widget form input[type="text"]:focus,
+.widget form input[type="email"]:focus,
+.widget form input[type="password"]:focus,
+.widget form input[type="number"]:focus,
+.widget form textarea:focus {
+    border-color: var(--primary-color);
+}
+
+.widget form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.widget form .primary-action-btn {
+    margin-top: 10px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 10px 0;
+    }
+
+    .sidebar .logo {
+        display: none;
+    }
+
+    .sidebar nav {
+        flex-grow: 0;
+    }
+
+    .sidebar nav ul {
+        display: flex;
+        padding: 0 5px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .sidebar nav ul li {
+        margin: 0 5px;
+    }
+
+    .sidebar nav ul li a {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .sidebar nav ul li a span:first-child {
+        font-size: 1.2em;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    .sidebar nav ul li a .nav-text {
+        display: none;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .widgets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .widgets-grid .widget {
+        grid-column: auto !important;
+        grid-row: auto !important;
+    }
+}
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">FW</div>
+            <nav id="sidebar-nav" aria-label="Main Navigation">
+                
+                </nav>
+            <div class="sidebar-footer">
+                <button id="switch-to-freelancer" class="view-switch-button">Freelancer View</button>
+                <button id="switch-to-client" class="view-switch-button">Client View</button>
+            </div>
+        </aside>
+
+        <main class="main-content" aria-labelledby="main-title">
+            <header class="header">
+                <h1 id="main-title">Dashboard</h1>
+                <div class="header-right">
+                    <div class="search-container">
+                        <label for="search-input" class="sr-only"></label>
+                        <input type="search" id="search-input" placeholder="Search Projects, Messages...">
+                    </div>
+                    <button class="icon-button" title="Notifications">
+                        <span aria-hidden="true">🔔</span>
+                        <span class="sr-only"></span>
+                    </button>
+                    <button id="theme-toggle" class="icon-button" title="Toggle Theme">
+                        <span class="theme-icon-sun" aria-hidden="true">☀️</span>
+                        <span class="theme-icon-moon" aria-hidden="true">🌙</span>
+                        <span class="sr-only"></span>
+                    </button>
+                    <div class="user-profile">
+                        <img src="placeholder-user.png" alt="User Avatar" title="User Name">
+                    </div>
+                </div>
+            </header>
+
+            <div class="views-container">
+
+                <section id="freelancer-dashboard-view" class="view-section">
+                    <div id="freelancer-dashboard-main" class="subsection">
+                        <div class="widgets-grid freelancer-grid">
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="5" data-view="freelancer">0</span>
+                                <span class="kpi-label">Active Projects</span>
+                            </div>
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="12" data-view="freelancer">0</span>
+                                <span class="kpi-label">Pending Proposals</span>
+                            </div>
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="85000" data-prefix="₹" data-view="freelancer">0</span>
+                                <span class="kpi-label">Earnings (Month)</span>
+                            </div>
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="3" data-view="freelancer">0</span>
+                                <span class="kpi-label">Unread Messages</span>
+                            </div>
+
+                            <div class="widget table-widget ongoing-projects">
+                                <h2>Ongoing Projects (Summary)</h2>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Project Title</th>
+                                            <th>Client</th>
+                                            <th>Deadline</th>
+                                            <th>Progress</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td>2025-05-15</td>
+                                            <td>
+                                                <progress value="70" max="100"></progress> 70%
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td>2025-04-30</td>
+                                            <td>
+                                                <progress value="45" max="100"></progress> 45%
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td>2025-05-15</td>
+                                            <td>
+                                                <progress value="70" max="100"></progress> 70%
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td>2025-04-30</td>
+                                            <td>
+                                                <progress value="45" max="100"></progress> 45%
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td>2025-05-15</td>
+                                            <td>
+                                                <progress value="70" max="100"></progress> 70%
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td>2025-04-30</td>
+                                            <td>
+                                                <progress value="45" max="100"></progress> 45%
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="widget-footer">
+                                    <a href="#" class="widget-link" data-nav-target="freelancer-projects">View All Projects &raquo;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="freelancer-projects" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>My Projects</h2>
+                        <div class="widget">
+                            <p>Full list of active, completed, and proposed projects.</p>
+                            <div class="table-widget">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Client</th>
+                                            <th>Status</th>
+                                            <th>Deadline</th>
+                                            <th>Budget (₹)</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-05-15</td>
+                                            <td>1,50,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-04-30</td>
+                                            <td>95,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Logo Design</td>
+                                            <td>Bakery Co.</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                            <td>2025-04-10</td>
+                                            <td>25,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-05-15</td>
+                                            <td>1,50,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-04-30</td>
+                                            <td>95,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Logo Design</td>
+                                            <td>Bakery Co.</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                            <td>2025-04-10</td>
+                                            <td>25,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-05-15</td>
+                                            <td>1,50,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-04-30</td>
+                                            <td>95,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Logo Design</td>
+                                            <td>Bakery Co.</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                            <td>2025-04-10</td>
+                                            <td>25,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Client Corp</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-05-15</td>
+                                            <td>1,50,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>API Integration</td>
+                                            <td>Startup Inc</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>2025-04-30</td>
+                                            <td>95,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Submit Work</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Logo Design</td>
+                                            <td>Bakery Co.</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                            <td>2025-04-10</td>
+                                            <td>25,000</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="freelancer-proposals" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>My Proposals</h2>
+                        <div class="widget">
+                            <p>List of proposals you have submitted.</p>
+                            <div class="table-widget">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Project Title</th>
+                                            <th>Submitted</th>
+                                            <th>Status</th>
+                                            <th>Client</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Logo Design for Bakery</td>
+                                            <td>2025-04-15</td>
+                                            <td><span class="status sent">Sent</span></td>
+                                            <td>Bakery Co.</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Withdraw</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Content Writing (Travel)</td>
+                                            <td>2025-04-14</td>
+                                            <td><span class="status viewed">Viewed</span></td>
+                                            <td>Travel Blog Inc.</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Social Media Strategy</td>
+                                            <td>2025-04-12</td>
+                                            <td><span class="status approved">Accepted</span></td>
+                                            <td>Marketing Firm</td>
+                                            <td>
+                                                <button class="action-btn">View Project</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Entry Task</td>
+                                            <td>2025-04-10</td>
+                                            <td><span class="status rejected">Rejected</span></td>
+                                            <td>Data Corp</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Logo Design for Bakery</td>
+                                            <td>2025-04-15</td>
+                                            <td><span class="status sent">Sent</span></td>
+                                            <td>Bakery Co.</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Withdraw</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Content Writing (Travel)</td>
+                                            <td>2025-04-14</td>
+                                            <td><span class="status viewed">Viewed</span></td>
+                                            <td>Travel Blog Inc.</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Social Media Strategy</td>
+                                            <td>2025-04-12</td>
+                                            <td><span class="status approved">Accepted</span></td>
+                                            <td>Marketing Firm</td>
+                                            <td>
+                                                <button class="action-btn">View Project</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Entry Task</td>
+                                            <td>2025-04-10</td>
+                                            <td><span class="status rejected">Rejected</span></td>
+                                            <td>Data Corp</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Logo Design for Bakery</td>
+                                            <td>2025-04-15</td>
+                                            <td><span class="status sent">Sent</span></td>
+                                            <td>Bakery Co.</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Withdraw</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Content Writing (Travel)</td>
+                                            <td>2025-04-14</td>
+                                            <td><span class="status viewed">Viewed</span></td>
+                                            <td>Travel Blog Inc.</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Social Media Strategy</td>
+                                            <td>2025-04-12</td>
+                                            <td><span class="status approved">Accepted</span></td>
+                                            <td>Marketing Firm</td>
+                                            <td>
+                                                <button class="action-btn">View Project</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Entry Task</td>
+                                            <td>2025-04-10</td>
+                                            <td><span class="status rejected">Rejected</span></td>
+                                            <td>Data Corp</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="freelancer-find-work" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Find Work</h2>
+                        <div class="widget">
+                            <p>Browse and search for available projects.</p>
+                            <div class="find-work">
+                                <div class="job-listing">
+                                    <h4>React Developer for Fintech App</h4>
+                                    <p>Budget: ₹1,50,000 - ₹2,50,000 | Skills: React, Node.js, Fintech</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>Graphic Designer for Branding</h4>
+                                    <p>Budget: ₹80,000 | Skills: Adobe Suite, Branding</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>SEO Content Writer Needed</h4>
+                                    <p>Budget: ₹5,000 per article | Skills: SEO, Writing, English</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>React Developer for Fintech App</h4>
+                                    <p>Budget: ₹1,50,000 - ₹2,50,000 | Skills: React, Node.js, Fintech</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>Graphic Designer for Branding</h4>
+                                    <p>Budget: ₹80,000 | Skills: Adobe Suite, Branding</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>SEO Content Writer Needed</h4>
+                                    <p>Budget: ₹5,000 per article | Skills: SEO, Writing, English</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>React Developer for Fintech App</h4>
+                                    <p>Budget: ₹1,50,000 - ₹2,50,000 | Skills: React, Node.js, Fintech</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>Graphic Designer for Branding</h4>
+                                    <p>Budget: ₹80,000 | Skills: Adobe Suite, Branding</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                                <div class="job-listing">
+                                    <h4>SEO Content Writer Needed</h4>
+                                    <p>Budget: ₹5,000 per article | Skills: SEO, Writing, English</p>
+                                    <button>View Details</button>
+                                    <button class="primary-action-btn">Submit Proposal</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="freelancer-earnings" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Earnings & Payouts</h2>
+                        <div class="widget">
+                            <p>Your transaction history, available balance, and payout settings.</p>
+                            <div class="table-widget">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>Project</th>
+                                            <th>Amount (₹)</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2025-04-16</td>
+                                            <td>Payout</td>
+                                            <td>-</td>
+                                            <td style="color: var(--danger-color);">- 50,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-10</td>
+                                            <td>Milestone</td>
+                                            <td>Logo Design</td>
+                                            <td>+ 25,000</td>
+                                            <td><span class="status completed">Cleared</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-05</td>
+                                            <td>Milestone</td>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>+ 75,000</td>
+                                            <td><span class="status pending">Pending Clearance</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-16</td>
+                                            <td>Payout</td>
+                                            <td>-</td>
+                                            <td style="color: var(--danger-color);">- 50,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-10</td>
+                                            <td>Milestone</td>
+                                            <td>Logo Design</td>
+                                            <td>+ 25,000</td>
+                                            <td><span class="status completed">Cleared</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-05</td>
+                                            <td>Milestone</td>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>+ 75,000</td>
+                                            <td><span class="status pending">Pending Clearance</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-16</td>
+                                            <td>Payout</td>
+                                            <td>-</td>
+                                            <td style="color: var(--danger-color);">- 50,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-10</td>
+                                            <td>Milestone</td>
+                                            <td>Logo Design</td>
+                                            <td>+ 25,000</td>
+                                            <td><span class="status completed">Cleared</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-05</td>
+                                            <td>Milestone</td>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>+ 75,000</td>
+                                            <td><span class="status pending">Pending Clearance</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="freelancer-messages" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Messages</h2>
+                        <div class="widget">
+                            <p>Your inbox and communication with clients.</p>
+                            <div class="messaging-placeholder">
+                                Messaging Interface Area
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="freelancer-profile" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>My Profile</h2>
+                        <div class="widget">
+                            <p>Edit your profile details, skills, portfolio, etc.</p>
+                            <form>
+                                <label for="profile-name">Name:</label>
+                                <input type="text" id="profile-name" value="Your Name"><br>
+                                <label for="profile-headline">Headline:</label>
+                                <input type="text" id="profile-headline" value="Experienced Web Developer"><br>
+                                <label for="profile-skills">Skills:</label>
+                                <input type="text" id="profile-skills" value="HTML, CSS, JavaScript, React, Node.js"><br>
+                                <button type="submit" class="primary-action-btn">Save Profile</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </section>
+
+                <section id="client-dashboard-view" class="view-section view-hidden" aria-hidden="true">
+                    <div id="client-dashboard-main" class="subsection">
+                        <div class="widgets-grid client-grid">
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="3" data-view="client">0</span>
+                                <span class="kpi-label">Active Projects</span>
+                            </div>
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="8" data-view="client">0</span>
+                                <span class="kpi-label">Proposals Received (New)</span>
+                            </div>
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="120000" data-prefix="₹" data-view="client">0</span>
+                                <span class="kpi-label">Spent (Month)</span>
+                            </div>
+                            <div class="widget kpi-card">
+                                <span class="kpi-value" data-target="2" data-view="client">0</span>
+                                <span class="kpi-label">Unread Messages</span>
+                            </div>
+
+                            <div class="widget table-widget active-client-projects">
+                                <h2>Your Active Projects (Summary)</h2>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Project Title</th>
+                                            <th>Freelancer</th>
+                                            <th>Status</th>
+                                            <th>Next Milestone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td>Riya Sharma</td>
+                                            <td><span class="status active">In Progress</span></td>
+                                            <td>2025-04-25</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Blog Content Plan</td>
+                                            <td>Amit Singh</td>
+                                            <td><span class="status pending">Awaiting Review</span></td>
+                                            <td>2025-04-20</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="widget-footer">
+                                    <a href="#" class="widget-link" data-nav-target="client-projects">View All Projects &raquo;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="client-projects" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>My Projects</h2>
+                        <div class="widget">
+                            <p>Manage your posted projects and view proposals.</p>
+                            <div class="table-widget">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Status</th>
+                                            <th>Proposals</th>
+                                            <th>Hired Freelancer</th>
+                                            <th>Posted On</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>15</td>
+                                            <td>Riya Sharma</td>
+                                            <td>2025-04-01</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Manage</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Blog Content Plan</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>8</td>
+                                            <td>Amit Singh</td>
+                                            <td>2025-03-20</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Manage</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mobile App Mockups</td>
+                                            <td><span class="status open">Open</span></td>
+                                            <td>5 (New)</td>
+                                            <td>-</td>
+                                            <td>2025-04-14</td>
+                                            <td>
+                                                <button class="action-btn">View Proposals</button>
+                                                <button class="action-btn">Edit</button>
+                                                <button class="action-btn">Close</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Analysis Task</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                            <td>12</td>
+                                            <td>Vikram Rao</td>
+                                            <td>2025-03-10</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E-commerce UI/UX</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>15</td>
+                                            <td>Riya Sharma</td>
+                                            <td>2025-04-01</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Manage</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Blog Content Plan</td>
+                                            <td><span class="status active">Active</span></td>
+                                            <td>8</td>
+                                            <td>Amit Singh</td>
+                                            <td>2025-03-20</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                                <button class="action-btn">Manage</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mobile App Mockups</td>
+                                            <td><span class="status open">Open</span></td>
+                                            <td>5 (New)</td>
+                                            <td>-</td>
+                                            <td>2025-04-14</td>
+                                            <td>
+                                                <button class="action-btn">View Proposals</button>
+                                                <button class="action-btn">Edit</button>
+                                                <button class="action-btn">Close</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Analysis Task</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                            <td>12</td>
+                                            <td>Vikram Rao</td>
+                                            <td>2025-03-10</td>
+                                            <td>
+                                                <button class="action-btn">View</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="client-post-job" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Post a New Job</h2>
+                        <div class="widget post-project">
+                            <p>Describe the job you need done and get proposals from qualified freelancers.</p>
+                            <form>
+                                <label for="job-title">Job Title:</label>
+                                <input type="text" id="job-title" placeholder="e.g., Website Redesign"><br>
+                                <label for="job-description">Description:</label>
+                                <textarea id="job-description" rows="5" placeholder="Detailed description of your project"></textarea><br>
+                                <label for="job-budget">Budget (₹):</label>
+                                <input type="number" id="job-budget" placeholder="Enter your budget"><br>
+                                <button type="submit" class="primary-action-btn">Post Job</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="client-freelancers" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>My Freelancers</h2>
+                        <div class="widget">
+                            <p>List of freelancers you have hired or are working with.</p>
+                            <div class="table-widget">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Skills</th>
+                                            <th>Rating</th>
+                                            <th>Projects Completed</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Riya Sharma</td>
+                                            <td>UI/UX Design, Web Design</td>
+                                            <td>⭐⭐⭐⭐⭐</td>
+                                            <td>15</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Amit Singh</td>
+                                            <td>Content Writing, SEO</td>
+                                            <td>⭐⭐⭐⭐</td>
+                                            <td>22</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vikram Rao</td>
+                                            <td>Data Analysis, Reporting</td>
+                                            <td>⭐⭐⭐⭐⭐</td>
+                                            <td>8</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Riya Sharma</td>
+                                            <td>UI/UX Design, Web Design</td>
+                                            <td>⭐⭐⭐⭐⭐</td>
+                                            <td>15</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Amit Singh</td>
+                                            <td>Content Writing, SEO</td>
+                                            <td>⭐⭐⭐⭐</td>
+                                            <td>22</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vikram Rao</td>
+                                            <td>Data Analysis, Reporting</td>
+                                            <td>⭐⭐⭐⭐⭐</td>
+                                            <td>8</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Riya Sharma</td>
+                                            <td>UI/UX Design, Web Design</td>
+                                            <td>⭐⭐⭐⭐⭐</td>
+                                            <td>15</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Amit Singh</td>
+                                            <td>Content Writing, SEO</td>
+                                            <td>⭐⭐⭐⭐</td>
+                                            <td>22</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vikram Rao</td>
+                                            <td>Data Analysis, Reporting</td>
+                                            <td>⭐⭐⭐⭐⭐</td>
+                                            <td>8</td>
+                                            <td><button class="action-btn view-btn">View Profile</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="client-payments" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Payments & Billing</h2>
+                        <div class="widget">
+                            <p>Your payment methods and billing history.</p>
+                            <div class="table-widget">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th>Amount (₹)</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2025-04-15</td>
+                                            <td>Payment to Riya Sharma (UI/UX)</td>
+                                            <td>- 75,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-03-25</td>
+                                            <td>Payment to Amit Singh (Content)</td>
+                                            <td>- 45,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-03-10</td>
+                                            <td>Payment to Vikram Rao (Data Analysis)</td>
+                                            <td>- 60,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-15</td>
+                                            <td>Payment to Riya Sharma (UI/UX)</td>
+                                            <td>- 75,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-03-25</td>
+                                            <td>Payment to Amit Singh (Content)</td>
+                                            <td>- 45,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-03-10</td>
+                                            <td>Payment to Vikram Rao (Data Analysis)</td>
+                                            <td>- 60,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-04-15</td>
+                                            <td>Payment to Riya Sharma (UI/UX)</td>
+                                            <td>- 75,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-03-25</td>
+                                            <td>Payment to Amit Singh (Content)</td>
+                                            <td>- 45,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2025-03-10</td>
+                                            <td>Payment to Vikram Rao (Data Analysis)</td>
+                                            <td>- 60,000</td>
+                                            <td><span class="status completed">Completed</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="client-messages" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Messages</h2>
+                        <div class="widget">
+                            <p>Your inbox and communication with freelancers.</p>
+                            <div class="messaging-placeholder">
+                                Messaging Interface Area
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="client-settings" class="subsection subsection-hidden" aria-hidden="true">
+                        <h2>Account Settings</h2>
+                        <div class="widget">
+                            <p>Manage your account details and preferences.</p>
+                            <form>
+                                <label for="account-email">Email:</label>
+                                <input type="email" id="account-email" value="your.email@example.com" readonly><br>
+                                <label for="account-password">Password:</label>
+                                <input type="password" id="account-password" value="********"><br>
+                                <button type="submit" class="primary-action-btn">Update Settings</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    console.log("User Dashboard Loaded");
+
+    const themeToggleButton = document.getElementById('theme-toggle');
+    const freelancerViewButton = document.getElementById('switch-to-freelancer');
+    const clientViewButton = document.getElementById('switch-to-client');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const mainTitle = document.getElementById('main-title');
+    const viewsContainer = document.querySelector('.views-container'); // Container for all subsections
+    const views = {
+        freelancer: document.getElementById('freelancer-dashboard-view'),
+        client: document.getElementById('client-dashboard-view')
+    };
+
+    let currentViewType = localStorage.getItem('dashboard-active-view') || 'freelancer'; // Track the main active view
+    let isAnimating = false; // Flag to prevent rapid animation triggers
+
+    // --- Theme Toggling ---
+    const applyTheme = (theme) => {
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+            document.body.classList.remove('dark-theme');
+        } else {
+            document.body.classList.add('dark-theme');
+            document.body.classList.remove('light-theme');
+        }
+        localStorage.setItem('dashboard-theme', theme);
+    };
+
+    themeToggleButton.addEventListener('click', () => {
+        const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+
+    // Apply saved theme on load
+    const savedTheme = localStorage.getItem('dashboard-theme') || 'dark';
+    applyTheme(savedTheme);
+
+
+    // --- GSAP Animation for KPI Numbers ---
+    function animateKpiNumbers(viewType) {
+        if (isAnimating) return; // Prevent new animations if one is running
+        isAnimating = true;
+
+        const kpiValues = document.querySelectorAll(`#${viewType}-dashboard-main .kpi-value[data-view="${viewType}"]`);
+
+        kpiValues.forEach(kpi => {
+            const targetValue = parseInt(kpi.getAttribute('data-target'), 10);
+            const prefix = kpi.getAttribute('data-prefix') || '';
+            const kpiCounter = { value: 0 };
+
+            gsap.to(kpiCounter, {
+                value: targetValue,
+                duration: 1.5,
+                ease: "power1.inOut",
+                onUpdate: function() {
+                    kpi.textContent = prefix + Math.round(kpiCounter.value).toLocaleString('en-IN');
+                },
+                onComplete: function() {
+                    kpi.textContent = prefix + targetValue.toLocaleString('en-IN');
+                    isAnimating = false; // Allow new animations
+                }
+            });
+        });
+    }
+
+
+    // --- Navigation Items with Target IDs ---
+    const navItems = {
+        freelancer: [
+            { id: 'dashboard', icon: '📊', label: 'Dashboard', target: 'freelancer-dashboard-main' },
+            { id: 'projects', icon: '💼', label: 'My Projects', target: 'freelancer-projects' },
+            { id: 'proposals', icon: '📄', label: 'My Proposals', target: 'freelancer-proposals' },
+            { id: 'find-work', icon: '🔍', label: 'Find Work', target: 'freelancer-find-work' },
+            { id: 'earnings', icon: '💰', label: 'Earnings', target: 'freelancer-earnings' },
+            { id: 'messages', icon: '💬', label: 'Messages', target: 'freelancer-messages' },
+            { id: 'profile', icon: '👤', label: 'Profile', target: 'freelancer-profile' },
+            
+        ],
+        client: [
+            { id: 'dashboard', icon: '📊', label: 'Dashboard', target: 'client-dashboard-main' },
+            { id: 'projects', icon: '💼', label: 'My Projects', target: 'client-projects' },
+            { id: 'post-job', icon: '➕', label: 'Post a Job', target: 'client-post-job' },
+            { id: 'freelancers', icon: '👥', label: 'My Freelancers', target: 'client-freelancers' },
+            { id: 'payments', icon: '💳', label: 'Payments', target: 'client-payments' },
+            { id: 'messages', icon: '💬', label: 'Messages', target: 'client-messages' },
+            { id: 'settings', icon: '⚙️', label: 'Settings', target: 'client-settings' },
+        ]
+    };
+
+
+    // --- Show Specific Subsection ---
+    function showSubsection(targetId) {
+        const parentView = document.getElementById(`${currentViewType}-dashboard-view`);
+        if (!parentView) return;
+
+        parentView.querySelectorAll('.subsection').forEach(sub => {
+            sub.classList.add('subsection-hidden');
+        });
+
+        const targetSubsection = document.getElementById(targetId);
+        if (targetSubsection) {
+            targetSubsection.classList.remove('subsection-hidden');
+            const navItem = navItems[currentViewType].find(item => item.target === targetId);
+            if (navItem && mainTitle) {
+                mainTitle.textContent = navItem.label;
+            }
+            if (targetId === `${currentViewType}-dashboard-main`) {
+                animateKpiNumbers(currentViewType);
+            }
+        } else {
+            console.warn("Target subsection not found:", targetId);
+            const defaultSubsection = document.getElementById(`${currentViewType}-dashboard-main`);
+            if (defaultSubsection) {
+                defaultSubsection.classList.remove('subsection-hidden');
+                if (mainTitle) mainTitle.textContent = "Dashboard";
+                animateKpiNumbers(currentViewType);
+            }
+        }
+    }
+
+
+    // --- Update Sidebar and Add Listeners ---
+    function updateSidebar(viewType) {
+        sidebarNav.innerHTML = '';
+        const items = navItems[viewType];
+        const ul = document.createElement('ul');
+
+        items.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.setAttribute('data-nav-id', item.id);
+
+            const a = document.createElement('a');
+            a.href = "#";
+            a.setAttribute('data-target-view', item.target);
+            a.innerHTML = `<span>${item.icon}</span> <span class="nav-text">${item.label}</span>`;
+
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSubsectionId = a.getAttribute('data-target-view');
+
+                if (targetSubsectionId) {
+                    ul.querySelectorAll('li').forEach(sibling => sibling.classList.remove('active'));
+                    li.classList.add('active');
+                    showSubsection(targetSubsectionId);
+                }
+            });
+
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+        sidebarNav.appendChild(ul);
+
+        // Set the first item ('Dashboard') as active visually after generating
+        const firstLi = sidebarNav.querySelector('ul li:first-child');
+        if(firstLi) firstLi.classList.add('active');
+    }
+
+
+    // --- Switch Between Freelancer/Client Main Views ---
+    function switchMainView(viewType) {
+        console.log("Switching main view to:", viewType);
+        currentViewType = viewType;
+
+        Object.values(views).forEach(view => view.classList.add('view-hidden'));
+
+        if (views[viewType]) {
+            views[viewType].classList.remove('view-hidden');
+            updateSidebar(viewType);
+            showSubsection(`${viewType}-dashboard-main`);
+
+            localStorage.setItem('dashboard-active-view', viewType);
+
+            // Highlight the correct demo switch button
+            freelancerViewButton.style.backgroundColor = (viewType === 'freelancer') ? 'var(--primary-color)' : '';
+            freelancerViewButton.style.color = (viewType === 'freelancer') ? 'white' : '';
+            clientViewButton.style.backgroundColor = (viewType === 'client') ? 'var(--primary-color)' : '';
+            clientViewButton.style.color = (viewType === 'client') ? 'white' : '';
+
+        } else {
+            console.error("Main view not found:", viewType);
+        }
+    }
+
+
+    // Add listeners to demo switch buttons
+    freelancerViewButton.addEventListener('click', () => switchMainView('freelancer'));
+    clientViewButton.addEventListener('click', () => switchMainView('client'));
+
+
+    // --- Initial Setup ---
+    switchMainView(currentViewType);
+
+
+    // --- Handle Widget Links to Navigate Subsections ---
+    viewsContainer.addEventListener('click', (e) => {
+        if (e.target.matches('.widget-link') && e.target.dataset.navTarget) {
+            e.preventDefault();
+            const targetSubsectionId = e.target.dataset.navTarget;
+            const targetNavLink = sidebarNav.querySelector(`a[data-target-view='${targetSubsectionId}']`);
+            if (targetNavLink) {
+                targetNavLink.click();
+            }
+        }
+    });
+
+}); // End DOMContentLoaded
+    </script>
+</body>
+</html>

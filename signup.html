@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Your Profile</title>
+    <style>
+      /* Basic Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #4ba25968;
+        color: #343a40; /* Dark gray text */
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .profile-container {
+        background-color: #fff; /* White container */
+        padding: 30px 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 700px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #212529; /* Darker text for heading */
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .profile-container > p {
+        text-align: center;
+        color: #6c757d; /* Medium gray for subtitle */
+        margin-bottom: 30px;
+        font-size: 1rem;
+      }
+
+      /* Progress Indicator */
+      .progress-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      .progress-indicator span {
+        flex-grow: 1;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      .progress-indicator span.active {
+        color: #007bff; /* Primary blue */
+        border-bottom-color: #007bff;
+        font-weight: 500;
+      }
+
+      /* Form Styling */
+      #profile-form fieldset {
+        border: none;
+        margin-bottom: 25px;
+        padding: 0;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 25px;
+      }
+
+      #profile-form fieldset:first-of-type {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      #profile-form legend {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529; /* Darker text for legend */
+        margin-bottom: 15px;
+        padding: 0;
+        width: 100%;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #495057; /* Slightly darker gray for labels */
+      }
+
+      .form-group input[type="text"],
+      .form-group input[type="email"],
+      .form-group input[type="url"],
+      .form-group input[type="number"],
+      .form-group input[type="file"],
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ced4da; /* Light gray border */
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: #007bff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .form-group small {
+        display: block;
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 5px;
+      }
+
+      .required {
+        color: #dc3545;
+        margin-left: 4px;
+      }
+
+      /* Role Selection Styling */
+      .role-options {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(200px, 1fr)
+        ); /* Adjust minmax for smaller screens */
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .role-option input[type="radio"] {
+        display: none;
+      }
+
+      .role-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #ced4da; /* Light gray border */
+        border-radius: 4px;
+        cursor: pointer;
+        transition: border-color 0.15s ease-in-out,
+          background-color 0.15s ease-in-out;
+        text-align: center;
+        min-height: 120px; /* Adjust min-height */
+        justify-content: center;
+      }
+
+      .role-option .role-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        color: #007bff; /* Primary blue for icons */
+      }
+
+      .role-option .role-title {
+        font-weight: 500;
+        font-size: 1rem;
+        margin-bottom: 3px;
+        color: #212529; /* Darker text for title */
+      }
+
+      .role-option .role-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+      }
+
+      .role-option input[type="radio"]:checked + label {
+        border-color: #007bff;
+        background-color: #e7f5ff; /* Light blue background when selected */
+      }
+
+      .role-option input[type="radio"]:focus + label {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      /* Step Hiding */
+      .form-step {
+        display: none;
+      }
+
+      .form-step.active {
+        display: block;
+      }
+
+      .step-hidden {
+        display: none !important; /* Ensure higher specificity */
+      }
+
+      /* Buttons */
+      .button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .primary-button,
+      .secondary-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out,
+          opacity 0.15s ease-in-out;
+        font-weight: 500;
+      }
+
+      .primary-button {
+        background-color: #007bff; /* Primary blue */
+        color: #fff;
+      }
+
+      .primary-button:hover {
+        background-color: #0056b3;
+      }
+
+      .primary-button:disabled {
+        background-color: #a0cfff;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .secondary-button {
+        background-color: #6c757d; /* Secondary gray */
+        color: #fff;
+      }
+
+      .secondary-button:hover {
+        background-color: #5a6268;
+      }
+
+      /* Error Messages Styling */
+      .error-message {
+        color: #dc3545; /* Error red */
+        font-size: 0.875rem;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .error-summary {
+        font-weight: 500;
+      }
+
+      /* Error Text Styling (next to fields) */
+      .error-text {
+        color: #dc3545; /* Error red */
+        font-size: 0.875rem;
+        display: block;
+        margin-top: 4px;
+        min-height: 1.2em;
+      }
+
+      /* Input Field Highlight on Error */
+      .form-group input.input-error,
+      .form-group select.input-error,
+      .form-group textarea.input-error {
+        border-color: #dc3545 !important;
+        background-color: #fdecea; /* Light red background for error */
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 600px) {
+        .profile-container {
+          padding: 20px;
+        }
+        h1 {
+          font-size: 1.75rem;
+        }
+        .profile-container > p {
+          font-size: 1rem;
+        }
+        .role-options {
+          grid-template-columns: 1fr;
+        }
+        .button-container {
+          flex-direction: column;
+        }
+        .primary-button,
+        .secondary-button {
+          width: 100%; /* Full width buttons on small screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile-container">
+      <h1>Complete Your Profile</h1>
+      <p>Let's get your account set up so you can start connecting.</p>
+
+      <div class="progress-indicator">
+        <span class="active">1. Basic Info</span>
+        <span>2. Choose Role</span>
+        <span>3. Your Details</span>
+      </div>
+
+      <form id="profile-form" novalidate>
+        <div class="form-step active" id="step-basic-info">
+          <fieldset>
+            <legend>Basic Information</legend>
+            <div class="form-group">
+              <label for="full-name"
+                >Full Name <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                id="full-name"
+                name="full_name"
+                required
+                placeholder="e.g., Riya Sharma"
+              />
+              <span class="error-text" data-for="full-name"></span>
+            </div>
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                placeholder="e.g., Mumbai, India"
+              />
+              <span class="error-text" data-for="location"></span>
+            </div>
+            <div class="form-group">
+              <label for="profile-picture">Profile Picture</label>
+              <input
+                type="file"
+                id="profile-picture"
+                name="profile_picture"
+                accept="image/*"
+              />
+              <small>Upload a clear photo (optional but recommended)</small>
+              <span class="error-text" data-for="profile-picture"></span>
+            </div>
+          </fieldset>
+          <div class="button-container">
+            <button
+              type="button"
+              class="primary-button next-step"
+              data-next="step-role-selection"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <div class="form-step" id="step-role-selection">
+          <fieldset>
+            <legend>Choose Your Role <span class="required">*</span></legend>
+            <p>How will you primarily use our platform?</p>
+            <div class="role-options">
+              <div class="role-option">
+                <input
+                  type="radio"
+                  id="role-freelancer"
+                  name="user_role"
+                  value="freelancer"
+                  required
+                />
+                <label for="role-freelancer">
+                  <span class="role-icon">💼</span>
+                  <span class="role-title">I'm a Freelancer</span>
+                  <span class="role-description"
+                    >Looking for projects to work on.</span
+                  >
+                </label>
+              </div>
+              <div class="role-option">
+                <input
+                  type="radio"
+                  id="role-client"
+                  name="user_role"
+                  value="client"
+                />
+                <label for="role-client">
+                  <span class="role-icon">🏢</span>
+                  <span class="role-title">I'm a Client</span>
+                  <span class="role-description"
+                    >Looking to hire for a project.</span
+                  >
+                </label>
+              </div>
+            </div>
+            <div
+              id="role-error"
+              class="error-message error-summary"
+              style="display: none"
+            >
+              Please select a role.
+            </div>
+          </fieldset>
+          <div class="button-container">
+            <button
+              type="button"
+              class="secondary-button prev-step"
+              data-prev="step-basic-info"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="primary-button next-step"
+              data-next="step-details"
+              disabled
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <div class="form-step" id="step-details">
+          <fieldset class="role-specific-fields" id="freelancer-details">
+            <legend>Freelancer Details</legend>
+            <div class="form-group">
+              <label for="headline"
+                >Profile Headline <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                id="headline"
+                name="headline"
+                placeholder="e.g., Experienced Web Developer | React & Node.js Expert"
+                required
+              />
+              <span class="error-text" data-for="headline"></span>
+            </div>
+            <div class="form-group">
+              <label for="skills">Skills <span class="required">*</span></label>
+              <input
+                type="text"
+                id="skills"
+                name="skills"
+                placeholder="e.g., HTML, CSS, JavaScript, React, Node.js, UI/UX Design (comma-separated)"
+                required
+              />
+              <small
+                >List your key skills relevant to the services you offer.</small
+              >
+              <span class="error-text" data-for="skills"></span>
+            </div>
+            <div class="form-group">
+              <label for="hourly-rate">Minimum Hourly Rate (₹)</label>
+              <input
+                type="number"
+                id="hourly-rate"
+                name="hourly_rate"
+                min="0"
+                placeholder="e.g., 2000"
+              />
+              <small>(Optional) Set a base rate per hour.</small>
+              <span class="error-text" data-for="hourly-rate"></span>
+            </div>
+            <div class="form-group">
+              <label for="bio">Bio / Overview</label>
+              <textarea
+                id="bio"
+                name="bio"
+                rows="5"
+                placeholder="Tell clients about your experience, expertise, and what makes you stand out..."
+              ></textarea>
+              <span class="error-text" data-for="bio"></span>
+            </div>
+            <div class="form-group">
+              <label for="portfolio-url">Portfolio URL (Optional)</label>
+              <input
+                type="url"
+                id="portfolio-url"
+                name="portfolio_url"
+                placeholder="https://yourportfolio.com"
+              />
+              <span class="error-text" data-for="portfolio-url"></span>
+            </div>
+          </fieldset>
+
+          <fieldset
+            class="role-specific-fields step-hidden"
+            id="client-details"
+          >
+            <legend>Client Details</legend>
+            <div class="form-group">
+              <label for="company-name">Company Name (Optional)</label>
+              <input
+                type="text"
+                id="company-name"
+                name="company_name"
+                placeholder="e.g., ACME Corporation"
+              />
+              <span class="error-text" data-for="company-name"></span>
+            </div>
+            <div class="form-group">
+              <label for="industry">Industry (Optional)</label>
+              <input
+                type="text"
+                id="industry"
+                name="industry"
+                placeholder="e.g., Technology, Marketing, E-commerce"
+              />
+              <span class="error-text" data-for="industry"></span>
+            </div>
+            <div class="form-group">
+              <label for="company-size">Company Size (Optional)</label>
+              <select id="company-size" name="company_size">
+                <option value="">Select Size</option>
+                <option value="1">Just Me</option>
+                <option value="2-10">2-10 Employees</option>
+                <option value="11-50">11-50 Employees</option>
+                <option value="51-200">51-200 Employees</option>
+                <option value="201+">201+ Employees</option>
+              </select>
+              <span class="error-text" data-for="company-size"></span>
+            </div>
+            <div class="form-group">
+              <p>Payment Method (Placeholder)</p>
+              <small
+                >In a real application, you'd integrate a secure payment gateway
+                setup here.</small
+              >
+              <button type="button" class="secondary-button">
+                Setup Payment Method
+              </button>
+            </div>
+          </fieldset>
+          <div class="button-container">
+            <button
+              type="button"
+              class="secondary-button prev-step"
+              data-prev="step-role-selection"
+            >
+              Previous
+            </button>
+            <button type="submit" id="submit-profile" class="primary-button">
+              Complete Profile & Go to Dashboard
+            </button>
+            <p
+              id="submit-error"
+              class="error-message error-summary"
+              style="display: none"
+            ></p>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          // --- Get Elements ---
+          const form = document.getElementById('profile-form');
+          const steps = document.querySelectorAll('.form-step');
+          const nextButtons = document.querySelectorAll('.next-step');
+          const prevButtons = document.querySelectorAll('.prev-step');
+          const submitButton = document.getElementById('submit-profile');
+          const roleRadios = document.querySelectorAll('input[name="user_role"]');
+          const freelancerDetails = document.getElementById('freelancer-details');
+          const clientDetails = document.getElementById('client-details');
+          const roleError = document.getElementById('role-error');
+          const submitError = document.getElementById('submit-error');
+          const progressSpans = document.querySelectorAll('.progress-indicator span');
+
+          let currentStep = 0;
+          let userRole = null;
+
+          // --- Function to Show a Step ---
+          function showStep(stepIndex) {
+              if (stepIndex >= 0 && stepIndex < steps.length) {
+                  steps.forEach((step, index) => {
+                      step.classList.remove('active');
+                      progressSpans[index].classList.remove('active');
+                  });
+                  steps[stepIndex].classList.add('active');
+                  progressSpans[stepIndex].classList.add('active');
+                  currentStep = stepIndex;
+
+                  // Hide/show previous button on the first step
+                  if (currentStep === 0) {
+                      prevButtons.forEach(button => button.style.display = 'none');
+                  } else {
+                      prevButtons.forEach(button => button.style.display = 'inline-block');
+                  }
+              }
+          }
+
+          // --- Event Listeners for Next Buttons ---
+          nextButtons.forEach(button => {
+              button.addEventListener('click', function() {
+                  if (validateCurrentStep()) {
+                      const nextStepId = this.dataset.next;
+                      const nextStepIndex = Array.from(steps).findIndex(step => step.id === nextStepId);
+                      if (nextStepIndex !== -1) {
+                          showStep(nextStepIndex);
+                      }
+                  }
+              });
+          });
+
+          // --- Event Listeners for Previous Buttons ---
+          prevButtons.forEach(button => {
+              button.style.display = 'none'; // Hide on initial load
+              button.addEventListener('click', function() {
+                  const prevStepId = this.dataset.prev;
+                  const prevStepIndex = Array.from(steps).findIndex(step => step.id === prevStepId);
+                  if (prevStepIndex !== -1) {
+                      showStep(prevStepIndex);
+                  }
+              });
+          });
+
+          // --- Role Selection Logic ---
+          roleRadios.forEach(radio => {
+              radio.addEventListener('change', function() {
+                  roleError.style.display = 'none';
+                  const nextButton = document.querySelector('#step-role-selection .next-step');
+                  nextButton.disabled = !this.checked;
+                  userRole = this.value;
+
+                  freelancerDetails.classList.add('step-hidden');
+                  clientDetails.classList.add('step-hidden');
+
+                  if (this.value === 'freelancer' && this.checked) {
+                      freelancerDetails.classList.remove('step-hidden');
+                  } else if (this.value === 'client' && this.checked) {
+                      clientDetails.classList.remove('step-hidden');
+                  }
+              });
+          });
+
+          // --- Helper: Clear All Error States ---
+          function clearAllErrors() {
+              const errorMessages = form.querySelectorAll('.error-text');
+              errorMessages.forEach(span => span.textContent = '');
+              const errorInputs = form.querySelectorAll('.input-error');
+              errorInputs.forEach(input => input.classList.remove('input-error'));
+              roleError.style.display = 'none';
+              submitError.style.display = 'none';
+          }
+
+          // --- Helper: Show Error for a Specific Field ---
+          function showError(fieldId, message) {
+              const errorSpan = form.querySelector(`.error-text[data-for="${fieldId}"]`);
+              const field = document.getElementById(fieldId);
+              if (errorSpan) {
+                  errorSpan.textContent = message;
+              }
+              if (field) {
+                  field.classList.add('input-error');
+              }
+          }
+
+          // --- Helper: Validate Current Step ---
+          function validateCurrentStep() {
+              const currentActiveStep = steps[currentStep];
+              const requiredFields = currentActiveStep.querySelectorAll('[required]');
+              let isValid = true;
+              let firstErrorElement = null;
+
+              requiredFields.forEach(field => {
+                  // Only validate fields that are currently visible
+                  if (field.offsetParent !== null) {
+                      if (!field.value.trim()) {
+                          isValid = false;
+                          const labelText = field.labels?.[0]?.textContent?.replace('*','').trim() || 'This field';
+                          showError(field.id, `${labelText} is required.`);
+                          if (!firstErrorElement) firstErrorElement = field;
+                      } else {
+                          // Add more specific validation based on field type
+                          if (field.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+                              isValid = false;
+                              showError(field.id, 'Please enter a valid email address.');
+                              if (!firstErrorElement) firstErrorElement = field;
+                          } else if (field.type === 'url' && field.value.trim() && !/^(ftp|http|https):\/\/[^ "]+$/.test(field.value)) {
+                              isValid = false;
+                              showError(field.id, 'Please enter a valid URL.');
+                              if (!firstErrorElement) firstErrorElement = field;
+                          } else if (field.type === 'number' && field.hasAttribute('min') && parseFloat(field.value) < parseFloat(field.getAttribute('min'))) {
+                              isValid = false;
+                              showError(field.id, `Please enter a value greater than or equal to ${field.getAttribute('min')}.`);
+                              if (!firstErrorElement) firstErrorElement = field;
+                          }
+                          // You can add more validation rules for other field types as needed
+                      }
+                  }
+              });
+
+              if (currentStep === 1) { // Validate role selection
+                  const selectedRole = document.querySelector('input[name="user_role"]:checked');
+                  if (!selectedRole) {
+                      isValid = false;
+                      roleError.style.display = 'block';
+                      if (!firstErrorElement) firstErrorElement = document.getElementById('step-role-selection').querySelector('legend');
+                  }
+              }
+
+              if (!isValid && firstErrorElement) {
+                  firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  setTimeout(() => { firstErrorElement.focus(); }, 300);
+              }
+
+              return isValid;
+          }
+
+          // --- Form Submission Validation ---
+          form.addEventListener('submit', function(event) {
+              event.preventDefault();
+              clearAllErrors();
+              let isValid = true;
+              let firstErrorElement = null;
+
+              steps.forEach(step => {
+                  const requiredFields = step.querySelectorAll('[required]');
+                  requiredFields.forEach(field => {
+                      // Only validate required fields that are visible
+                      if (field.offsetParent !== null) {
+                          if (!field.value.trim()) {
+                              isValid = false;
+                              const labelText = field.labels?.[0]?.textContent?.replace('*','').trim() || 'This field';
+                              showError(field.id, `${labelText} is required.`);
+                              if (!firstErrorElement && step.classList.contains('active')) firstErrorElement = field;
+                          }
+                      }
+                  });
+              });
+
+              const selectedRole = document.querySelector('input[name="user_role"]:checked');
+              if (!selectedRole) {
+                  isValid = false;
+                  roleError.style.display = 'block';
+                  if (!firstErrorElement) firstErrorElement = document.getElementById('step-role-selection').querySelector('legend');
+              }
+
+              if (isValid) {
+                  submitError.style.display = 'none';
+                  console.log('Form is valid! Simulating submission...');
+                  submitButton.disabled = true;
+                  submitButton.textContent = 'Processing...';
+
+                  const formData = new FormData(form);
+                  console.log('Form Data:');
+                  for (let [key, value] of formData.entries()) {
+                      if (value instanceof File) {
+                          if(value.name) console.log(`${key}: ${value.name} (File: ${value.size} bytes)`);
+                      } else if (value) {
+                          console.log(`${key}: ${value}`);
+                      }
+                  }
+
+                  setTimeout(() => {
+                      alert("Profile Completed (Simulated)! Redirecting to your dashboard...");
+                      const role = selectedRole.value;
+                      console.log(`Would redirect to ${role}-dashboard.html.`);
+                      submitButton.disabled = false;
+                      submitButton.textContent = 'Complete Profile & Go to Dashboard';
+                      window.location.href = 'Userdashboard.html';
+                  }, 1500);
+
+              } else {
+                  console.log('Form is invalid.');
+                  submitError.textContent = 'Please review the highlighted fields above and ensure all required fields are filled.';
+                  submitError.style.display = 'block';
+                  const firstInvalid = form.querySelector('.input-error');
+                  if (firstInvalid) {
+                      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setTimeout(() => { firstInvalid.focus(); }, 300);
+                  } else if (!selectedRole) {
+                      document.getElementById('step-role-selection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+              }
+          });
+
+          // --- Initialize the form to show the first step ---
+          showStep(0);
+      });
+
+    </script>
+  </body>
+</html>
