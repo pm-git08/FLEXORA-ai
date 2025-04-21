@@ -1,0 +1,19 @@
+#
+
+# --- Other configurations like title, theme, plugins etc. go here ---
+
+# Exclude from processing.
+# These items will be ignored by Jekyll during the build process.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/        # Excludes any top-level node_modules folder
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md            # Often excluded if using jekyll-readme-index plugin
+  - FLEXORA-BE/          # Add this line - Excludes the entire FLEXORA-BE directory and its contents
+# - Any other files/folders you wish to exclude
+
+# --- Ensure the rest of your _config.yml file is present ---
