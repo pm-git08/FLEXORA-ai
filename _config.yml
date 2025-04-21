@@ -1,19 +1,37 @@
-#
+# Other configurations...
+title: My FLEXORA Site
+email: your-email@example.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Write description here.
+baseurl: "/index.html" # the subpath of your site, e.g. /blog
+url: "HTTP://FLEXORA-ai.com" # the base hostname & protocol for your site, e.g. http://example.com
 
-# --- Other configurations like title, theme, plugins etc. go here ---
+# Build settings
+markdown: kramdown
+theme: jekyll-theme-primer # Your theme
 
 # Exclude from processing.
-# These items will be ignored by Jekyll during the build process.
+# The following items will not be processed, by default.
+# Any item listed under the `exclude:` key here will be automatically added to
+# the internal list.
+#
+# Excluded items can be processed by explicitly listing the directories or
+# their entries' file path in the `include:` list.
 exclude:
   - Gemfile
   - Gemfile.lock
-  - node_modules/        # Excludes any top-level node_modules folder
+  - node_modules/        # Make sure this is present
+  - FLEXORA-BE/          # Add this line to exclude the entire backend folder
+  # Or if you only want to exclude node_modules within FLEXORA-BE:
+  # - FLEXORA-BE/node_modules/
   - vendor/bundle/
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-  - README.md            # Often excluded if using jekyll-readme-index plugin
-  - FLEXORA-BE/          # Add this line - Excludes the entire FLEXORA-BE directory and its contents
-# - Any other files/folders you wish to exclude
+  # Add other files/folders to exclude if needed
 
-# --- Ensure the rest of your _config.yml file is present ---
+# Plugins (might already be here)
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  # Other plugins...
